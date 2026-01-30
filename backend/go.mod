@@ -1,10 +1,11 @@
-module merepen/backend
+module merenib/backend
 
 go 1.25.6
 
+require github.com/gofiber/fiber/v2 v2.52.10
+
 require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
-	github.com/gofiber/fiber/v2 v2.52.10 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
