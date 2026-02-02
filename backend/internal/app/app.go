@@ -41,6 +41,10 @@ func Run(cfg Config) {
 	// Board endpoints (CRUD)
 	boardGroup := api.Group("/boards", authMiddleware.RequireLogin)
 	boardGroup.Post("/", boardHandler.Create)
+	boardGroup.Get("/", boardHandler.List)
+	boardGroup.Get("/:id", boardHandler.Get)
+	boardGroup.Put("/:id", boardHandler.Update)
+	boardGroup.Delete("/:id", boardHandler.Delete)
 
 	log.Fatal(app.Listen(":" + cfg.Port))
 }
