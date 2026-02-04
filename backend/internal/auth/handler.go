@@ -60,7 +60,7 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 		Secure:   false, // true для https
 		Path:     "/",
 		Expires:  time.Now().Add(24 * time.Hour),
-		//SameSite: "Strict",
+		SameSite: "None", // Strict для прода
 	})
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -77,6 +77,8 @@ func (h *AuthHandler) Logout(c *fiber.Ctx) error {
 		HTTPOnly: true,
 		Path:     "/",
 		Expires:  time.Now().Add(-1 * time.Hour),
+		SameSite: "None",
+		Secure:   false,
 	})
 	return c.SendStatus(fiber.StatusNoContent)
 }

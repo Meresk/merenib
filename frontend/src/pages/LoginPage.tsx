@@ -1,47 +1,48 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { login } from "../api/auth";
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext';
 
-export default function LoginPage() {
-  const [loginValue, setLogin] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+export function LoginPage() {
+  const { login, user } = useAuth();
   const navigate = useNavigate();
 
-  async function handleLogin() {
-    setError("");
+  const [loginValue, setLoginValue] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (user) {
+      navigate('/app');
+    }
+  }, [user, navigate]);
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError('');
+
     try {
       await login(loginValue, password);
-      navigate("/app");
+      navigate('/app');
     } catch {
-      setError("Invalid credentials");
+      setError('Неверный логин или пароль');
     }
   }
 
   return (
-    <div>
-      <h1>Login</h1>
-
+    <form onSubmit={onSubmit}>
       <input
         placeholder="login"
         value={loginValue}
-        onChange={(e) => setLogin(e.target.value)}
+        onChange={(e) => setLoginValue(e.target.value)}
       />
-
       <input
-        placeholder="password"
         type="password"
+        placeholder="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-
-      <button onClick={handleLogin}>Login</button>
-
-      {error && <p>{error}</p>}
-
-      <hr />
-
-      <button onClick={() => navigate("/admin")}>Admin</button>
-    </div>
+      <button type="submit">Login</button>
+      {error && <div>{error}</div>}
+    </form>
   );
 }

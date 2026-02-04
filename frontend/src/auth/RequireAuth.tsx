@@ -1,21 +1,17 @@
-import { Navigate } from "react-router-dom";
-import { useAuth } from "./AuthContext";
-import type { JSX } from "react";
+import { Navigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
+import type { JSX } from 'react';
 
 export function RequireAuth({ children }: { children: JSX.Element }) {
   const { user, loading } = useAuth();
 
-  if (loading) return null;
-  if (!user) return <Navigate to="/" />;
+  if (loading) {
+    <div> Loading... </div>
+  }
 
-  return children;
-}
-
-export function RequireAdmin({ children }: { children: JSX.Element }) {
-  const { user, loading } = useAuth();
-
-  if (loading) return null;
-  if (!user?.is_admin) return <Navigate to="/app" />;
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
 
   return children;
 }

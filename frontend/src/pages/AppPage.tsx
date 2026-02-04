@@ -1,8 +1,9 @@
-import { logout } from "../api/auth";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext";
 
-export default function AppPage() {
+export function AppPage() {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   async function handleLogout() {
     await logout();
@@ -11,7 +12,7 @@ export default function AppPage() {
 
   return (
     <div>
-      <h1>User App</h1>
+      <h1>APP, HELOO {user?.login}</h1>
       <p>Here will be Excalidraw boards</p>
 
       <button onClick={handleLogout}>Logout</button>
