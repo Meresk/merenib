@@ -8,6 +8,7 @@ import (
 	"merenib/backend/internal/user"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
@@ -16,6 +17,12 @@ func Run(cfg Config) {
 
 	app := fiber.New()
 	app.Use(logger.New())
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     cfg.AllowOrigins,
+		AllowHeaders:     cfg.AllowHeaders,
+		AllowMethods:     cfg.AllowMethods,
+		AllowCredentials: true,
+	}))
 
 	// Handlers
 	userHandler := user.NewHandler()
@@ -29,6 +36,7 @@ func Run(cfg Config) {
 	authGroup := api.Group("/auth")
 	authGroup.Post("/login", authHandler.Login)
 	authGroup.Post("/logout", authHandler.Logout)
+	authGroup.Get("/me", authMiddleware.RequireLogin, authHandler.Me)
 
 	// User endpoints (CRUD)
 	userGroup := api.Group("/users", authMiddleware.RequireLogin, authMiddleware.RequireAdmin)
@@ -41,6 +49,10 @@ func Run(cfg Config) {
 	// Board endpoints (CRUD)
 	boardGroup := api.Group("/boards", authMiddleware.RequireLogin)
 	boardGroup.Post("/", boardHandler.Create)
+	boardGroup.Get("/", boardHandler.List)
+	boardGroup.Get("/:id", boardHandler.Get)
+	boardGroup.Put("/:id", boardHandler.Update)
+	boardGroup.Delete("/:id", boardHandler.Delete)
 
 	log.Fatal(app.Listen(":" + cfg.Port))
 }

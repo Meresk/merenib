@@ -1,0 +1,84 @@
+/* Центрированная кнопка */
+.centerButton {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;       
+  height: 40px;      
+  border-radius: 50%; 
+  background-color: rgba(255, 255, 255, 0.029);
+  backdrop-filter: blur(3px);
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  font-size: 14px;
+  color: #fff;
+  cursor: pointer;
+  z-index: 1;
+
+  /* Центрируем текст */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Форма входа */
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  gap: 16px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+.loginInput {
+  padding: 12px;
+  font-size: 16px;
+}
+
+.loginButton {
+  padding: 12px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.cancelButton {
+  margin-top: 8px;
+  padding: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  background: transparent;
+  color: #888;
+  border: none;
+}
+
+.errorText {
+  color: red;
+  text-align: center;
+}
+
+.creatortxt {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 10px;
+  backdrop-filter: blur(8px);
+  padding: 8px 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 20;
+  
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.creatortxt:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.9);
+}

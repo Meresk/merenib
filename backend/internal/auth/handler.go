@@ -26,7 +26,7 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	}
 
 	if err := c.BodyParser(&input); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invealid request"})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid request"})
 	}
 
 	var id int
@@ -60,10 +60,14 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 		Secure:   false, // true для https
 		Path:     "/",
 		Expires:  time.Now().Add(24 * time.Hour),
-		SameSite: "Strict",
+		SameSite: "None", // Strict для прода
 	})
 
-	return c.SendStatus(fiber.StatusNoContent)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"id":       id,
+		"login":    input.Login,
+		"is_admin": isAdmin,
+	})
 }
 
 func (h *AuthHandler) Logout(c *fiber.Ctx) error {
@@ -73,8 +77,18 @@ func (h *AuthHandler) Logout(c *fiber.Ctx) error {
 		HTTPOnly: true,
 		Path:     "/",
 		Expires:  time.Now().Add(-1 * time.Hour),
+		SameSite: "None",
+		Secure:   false,
 	})
 	return c.SendStatus(fiber.StatusNoContent)
+}
+
+func (h *AuthHandler) Me(c *fiber.Ctx) error {
+	return c.JSON(fiber.Map{
+		"id":       c.Locals("user_id"),
+		"login":    c.Locals("login"),
+		"is_admin": c.Locals("is_admin"),
+	})
 }
 
 func (h *AuthHandler) generateToken(id int, login string, isAdmin bool) (string, error) {

@@ -1,14 +1,15 @@
-import "@excalidraw/excalidraw/index.css";
-import { Excalidraw } from '@excalidraw/excalidraw'
+// App.tsx
+import { RouterProvider } from 'react-router-dom';
+import { router } from './router/router';
+import { AppBackground } from './components/background/AppBackground'
+import { AuthProvider } from './auth/AuthContext';
 
-function App() {
+export function App() {
   return (
-    <>
-    <div style={{width: "100%", height: "100%"}}>
-      <Excalidraw />
-    </div>
-    </>
-  )
+    <AuthProvider>
+      <AppBackground useLightPillar>
+        <RouterProvider router={router} />
+      </AppBackground>
+    </AuthProvider>
+  );
 }
-
-export default App
