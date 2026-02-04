@@ -12,12 +12,14 @@ export const AppBackground: React.FC<AppBackgroundProps> = ({ children, useLight
       {useLightPillar && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
           <LightPillar
-            topColor="#8ef971"
+            topColor="#a3dffb"
             bottomColor="#9eb6ff"
+            // topColor="#8ef971"
+            // bottomColor="#9eb6ff"
             intensity={0.7}
             rotationSpeed={0.2}
             glowAmount={0.001}
-            pillarWidth={8.7}
+            pillarWidth={9.7}
             pillarHeight={0.4}
             noiseIntensity={0.5}
             pillarRotation={25}

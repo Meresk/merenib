@@ -64,7 +64,7 @@ export const LoginPage: React.FC = () => {
         {error && <div className={styles.errorText}>{error}</div>}
       </form>
 
-      <div className={styles.footerBadge}>by. meresk.</div>
+      <div className={styles.creatortxt}>by. meresk.</div>
     </>
   );
 };
