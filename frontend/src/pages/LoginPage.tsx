@@ -9,8 +9,10 @@ export const LoginPage: React.FC = () => {
 
   const [loginValue, setLoginValue] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [open, setOpen] = useState(false);
+
+  const [submitted, setSubmitted] = useState(false);
+  const [authError, setAuthError] = useState(false);
 
   useEffect(() => {
     if (user) navigate('/app');
@@ -18,49 +20,79 @@ export const LoginPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setSubmitted(true);
+    setAuthError(false);
+
+    if (!loginValue || !password) return;
+
     try {
       await login(loginValue, password);
     } catch {
-      setError('Неверный логин или пароль');
+      setAuthError(true);
     }
   };
 
+  const loginError = submitted && !loginValue;
+  const passwordError = submitted && !password;
+
   return (
     <>
-      <div className={`${styles.morph} ${open ? styles.open : ''}`}>
+      <div
+        className={`${styles.morph} ${open ? styles.open : ''} ${
+          authError ? styles.formError : ''
+        }`}
+      >
         <button
           className={styles.centerButton}
-          onClick={() => setOpen(true)}
+          onClick={() => {
+            setOpen(true);
+            setSubmitted(false);
+            setAuthError(false);
+          }}
         >
           ?
         </button>
 
         <form onSubmit={handleSubmit} className={styles.loginForm}>
           <input
-            placeholder="Login"
+            placeholder="login"
             value={loginValue}
-            onChange={(e) => setLoginValue(e.target.value)}
-            className={styles.loginInput}
+            onChange={(e) => {
+              setLoginValue(e.target.value);
+              if (submitted) setSubmitted(false);
+              setAuthError(false);
+            }}
+            className={`${styles.loginInput} ${
+              loginError ? styles.inputError : ''
+            }`}
           />
           <input
             type="password"
-            placeholder="Password"
+            placeholder="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={styles.loginInput}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (submitted) setSubmitted(false);
+              setAuthError(false);
+            }}
+            className={`${styles.loginInput} ${
+              passwordError ? styles.inputError : ''
+            }`}
           />
           <button type="submit" className={styles.loginButton}>
-            Войти
+            inlet
           </button>
           <button
             type="button"
             className={styles.cancelButton}
-            onClick={() => setOpen(false)}
+            onClick={() => {
+              setOpen(false);
+              setSubmitted(false);
+              setAuthError(false);
+            }}
           >
-            Отмена
+            outlet
           </button>
-          {error && <div className={styles.errorText}>{error}</div>}
         </form>
       </div>
 

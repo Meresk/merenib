@@ -21,7 +21,9 @@
     width 0.35s ease,
     height 0.35s ease,
     border-radius 0.35s ease,
-    background 0.35s ease;
+    background 0.35s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 
   overflow: hidden;
   z-index: 1;
@@ -30,9 +32,14 @@
 /* Открытое состояние */
 .morph.open {
   width: 320px;
-  height: 260px;
+  height: 220px;  
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.08);
+}
+
+
+.morph:not(.open) .loginForm {
+  transition: none;
 }
 
 /* Кнопка */
@@ -42,7 +49,7 @@
   border-radius: 50%;
   background: transparent;
   border: none;
-  color: #fff;
+  color: #a5a4a4;;
   cursor: pointer;
 
   display: flex;
@@ -50,6 +57,9 @@
   justify-content: center;
 
   transition: opacity 0.2s ease, transform 0.2s ease;
+
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
 .morph.open .centerButton {
@@ -68,11 +78,14 @@
   gap: 14px;
 
   opacity: 0;
-  transform: translateY(10px);
+  transform: translateY(10px) scale(0.98);
   pointer-events: none;
 
-  transition: opacity 0.25s ease 0.15s, transform 0.25s ease 0.15s;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
 }
+
 
 .morph.open .loginForm {
   opacity: 1;
@@ -86,8 +99,20 @@
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
+  color: #cccccc;
+  outline: none;
+
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
 }
+
+.loginInput:focus {
+  border-color: rgba(180, 180, 180, 0.45);
+  background: rgba(255, 255, 255, 0.06);
+}
+
 
 .loginButton {
   padding: 12px;
@@ -95,32 +120,66 @@
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.08);
   border: none;
-  color: #fff;
+  color: #8f9d8f;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
 .cancelButton {
   background: none;
   border: none;
-  color: #aaa;
+  color: #b99595;
   cursor: pointer;
-}
-
-.errorText {
-  color: #ff6b6b;
-  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
 /* Подпись */
 .creatortxt {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 12px;
+  right: 12px;
+
   font-size: 10px;
-  color: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(8px);
-  padding: 8px 16px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  letter-spacing: 0.06em;
+
+  color: rgba(255, 255, 255, 0.55);
+
+  padding: 6px 14px;
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(6px);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  box-shadow: none;
+
+  user-select: none;
+  cursor: default;
+
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+.creatortxt:hover {
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Ошибка инпута */
+.inputError {
+  border-color: #923638;
+  
+}
+
+.formError {
+  border-color: #923638;
+}
+
+.cancelButton:focus {
+  outline: none;
 }
