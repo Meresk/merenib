@@ -15,17 +15,22 @@ export async function apiFetch<T>(
 
   if (!res.ok) {
     let error: any = null;
-
     try {
       error = await res.json();
     } catch {
       error = { message: res.statusText };
     }
-
     throw error;
   }
 
-  if (res.status === 204) {
+  // Если тело пустое — возвращаем undefined
+  if (res.status === 204 || res.headers.get("Content-Length") === "0") {
+    return undefined as T;
+  }
+
+  // Проверим Content-Type, если не JSON — тоже возвращаем undefined
+  const contentType = res.headers.get("Content-Type");
+  if (!contentType || !contentType.includes("application/json")) {
     return undefined as T;
   }
 
