@@ -1,84 +1,185 @@
-/* Центрированная кнопка */
-.centerButton {
+/* Общий контейнер (морфинг) */
+.morph {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 40px;       
-  height: 40px;      
-  border-radius: 50%; 
-  background-color: rgba(255, 255, 255, 0.029);
+
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(3px);
   border: 2px solid rgba(255, 255, 255, 0.18);
-  font-size: 14px;
-  color: #fff;
-  cursor: pointer;
-  z-index: 1;
 
-  /* Центрируем текст */
   display: flex;
   align-items: center;
   justify-content: center;
+
+  transition:
+    width 0.35s ease,
+    height 0.35s ease,
+    border-radius 0.35s ease,
+    background 0.35s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+
+  overflow: hidden;
+  z-index: 1;
 }
 
-/* Форма входа */
+/* Открытое состояние */
+.morph.open {
+  width: 320px;
+  height: 220px;  
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+
+.morph:not(.open) .loginForm {
+  transition: none;
+}
+
+/* Кнопка */
+.centerButton {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: #a5a4a4;;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: opacity 0.2s ease, transform 0.2s ease;
+
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+.morph.open .centerButton {
+  opacity: 0;
+  transform: scale(0.8);
+  pointer-events: none;
+}
+
+/* Форма */
 .loginForm {
+  position: absolute;
+  inset: 20px;
+
   display: flex;
   flex-direction: column;
-  width: 300px;
-  gap: 16px;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1;
-  transition: all 0.3s ease;
+  gap: 14px;
+
+  opacity: 0;
+  transform: translateY(10px) scale(0.98);
+  pointer-events: none;
+
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+}
+
+
+.morph.open .loginForm {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 .loginInput {
   padding: 12px;
-  font-size: 16px;
+  font-size: 15px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cccccc;
+  outline: none;
+
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
 }
+
+.loginInput:focus {
+  border-color: rgba(180, 180, 180, 0.45);
+  background: rgba(255, 255, 255, 0.06);
+}
+
 
 .loginButton {
   padding: 12px;
-  font-size: 16px;
+  font-size: 15px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: #8f9d8f;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
 .cancelButton {
-  margin-top: 8px;
-  padding: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  background: transparent;
-  color: #888;
+  background: none;
   border: none;
+  color: #b99595;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
-.errorText {
-  color: red;
-  text-align: center;
-}
-
+/* Подпись */
 .creatortxt {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  color: rgba(255, 255, 255, 0.8);
+  bottom: 12px;
+  right: 12px;
+
   font-size: 10px;
-  backdrop-filter: blur(8px);
-  padding: 8px 16px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  z-index: 20;
-  
+  letter-spacing: 0.06em;
+
+  color: rgba(255, 255, 255, 0.55);
+
+  padding: 6px 14px;
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(6px);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  box-shadow: none;
+
   user-select: none;
-  -webkit-user-select: none;
+  cursor: default;
+
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+.creatortxt:hover {
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
-.creatortxt:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.9);
+/* Ошибка инпута */
+.inputError {
+  border-color: #923638;
+  
+}
+
+.formError {
+  border-color: #923638;
+}
+
+.cancelButton:focus {
+  outline: none;
 }

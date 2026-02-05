@@ -1,0 +1,120 @@
+.pageContainer {
+  padding: 32px;
+  font-family: sans-serif;
+  color: #fff;
+}
+
+.header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.userPanel {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(6px);
+  padding: 6px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.loggedText {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.logoutButton {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  cursor: pointer;
+  color: #fff;
+  font-size: 13px;
+  outline: none;
+}
+
+.logoutButton:active {
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.12);
+}
+
+.boardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  grid-auto-rows: min-content;
+}
+
+.boardCard {
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+}
+
+.boardCard:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+.boardUpdated {
+  font-size: 11px;
+  opacity: 0.5;
+  margin-top: 4px;
+}
+
+.addCard {
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px dashed rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.addText {
+  width: 100%;
+  text-align: center;
+}
+
+.createForm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  color: #fff;
+  outline: none;
+}
+
+.input:focus {
+  border-color: #aaa;
+}
+
+.createButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.createButtons button {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  cursor: pointer;
+}
+
+.createButtons button:active {
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.12);
+}

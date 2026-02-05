@@ -3,6 +3,7 @@ import { LoginPage } from '../pages/LoginPage';
 import { AppPage } from '../pages/AppPage';
 
 import { RequireAuth } from '../auth/RequireAuth';
+import { BoardPage } from '../pages/BoardPage';
 
 export const router = createBrowserRouter([
   {
@@ -14,6 +15,14 @@ export const router = createBrowserRouter([
     element: (
       <RequireAuth>
         <AppPage />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/boards/:id',
+    element: (
+      <RequireAuth>
+        <BoardPage />
       </RequireAuth>
     ),
   },
