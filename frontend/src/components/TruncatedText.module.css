@@ -1,0 +1,13 @@
+.tooltipBox {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 8px;
+  border-radius: 4px;
+  padding: 3px 4px;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  max-width: 200px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}

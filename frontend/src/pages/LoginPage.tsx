@@ -15,7 +15,10 @@ export const LoginPage: React.FC = () => {
   const [authError, setAuthError] = useState(false);
 
   useEffect(() => {
-    if (user) navigate('/app');
+    if (!user) return;
+    
+    if (user.is_admin) navigate('/dashboard')
+    else navigate('app');
   }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {

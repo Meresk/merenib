@@ -2,6 +2,15 @@
   padding: 32px;
   font-family: sans-serif;
   color: #fff;
+
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.pageContainerVisible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .header {
@@ -53,23 +62,16 @@
   border-radius: 12px;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.08);
-  cursor: pointer;
-}
-
-.boardCard > div:first-child {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .boardCard:hover {
   background: rgba(255,255,255,0.06);
 }
 
-.boardUpdated {
-  font-size: 11px;
-  opacity: 0.5;
-  margin-top: 4px;
+.boardCardContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .boardName {
@@ -78,10 +80,11 @@
   text-overflow: ellipsis;
 }
 
-/* ---------- ADD CARD ---------- */
 
+
+/* ---------- ADD CARD ---------- */
 .addCard {
-  height: 70px;
+  min-height: 70px;
   padding: 18px;
   box-sizing: border-box;
 
@@ -112,7 +115,6 @@
   opacity: 1;
 }
 
-/* слой-контейнер, БЕЗ transform */
 .addContent {
   position: absolute;
   inset: 0;
@@ -130,8 +132,6 @@
   opacity: 0;
   pointer-events: none;
 }
-
-/* ---------- FORM ---------- */
 
 .createForm {
   display: flex;
@@ -193,19 +193,4 @@
 .circleButton:active {
   transform: scale(0.9);
   box-shadow: 0 0 0 3px rgba(255,255,255,0.12);
-}
-
-.pageContainer {
-  padding: 32px;
-  font-family: sans-serif;
-  color: #fff;
-
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-}
-
-.pageContainerVisible {
-  opacity: 1;
-  transform: translateY(0);
 }

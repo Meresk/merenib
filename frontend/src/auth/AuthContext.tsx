@@ -1,9 +1,9 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import * as authApi from '../api/auth';
-import type { User } from '../api/types';
+import type { AuthUser } from '../api/types';
 
 type AuthContextType = {
-  user: User | null;
+  user: AuthUser | null;
   loading: boolean;
   login: (login: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -12,7 +12,7 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

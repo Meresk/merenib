@@ -41,7 +41,7 @@ func Run(cfg Config) {
 	// User endpoints (CRUD)
 	userGroup := api.Group("/users", authMiddleware.RequireLogin, authMiddleware.RequireAdmin)
 	userGroup.Post("/", userHandler.Create)
-	userGroup.Get("", userHandler.List)
+	userGroup.Get("/", userHandler.List)
 	userGroup.Get("/:id", userHandler.GetById)
 	userGroup.Put("/:id", userHandler.Update)
 	userGroup.Delete("/:id", userHandler.Delete)

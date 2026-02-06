@@ -1,7 +1,12 @@
-export type User = {
+export type AuthUser = {
   id: number;
   login: string;
   is_admin: boolean;
+};
+
+export type User = {
+  id: number;
+  login: string;
 };
 
 export interface Board {
