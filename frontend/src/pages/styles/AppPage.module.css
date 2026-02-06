@@ -194,3 +194,18 @@
   transform: scale(0.9);
   box-shadow: 0 0 0 3px rgba(255,255,255,0.12);
 }
+
+.pageContainer {
+  padding: 32px;
+  font-family: sans-serif;
+  color: #fff;
+
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.pageContainerVisible {
+  opacity: 1;
+  transform: translateY(0);
+}

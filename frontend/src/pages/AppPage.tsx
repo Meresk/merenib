@@ -16,10 +16,17 @@ export function AppPage() {
   const [creatingBoard, setCreatingBoard] = useState(false);
   const [newName, setNewName] = useState('');
 
+  const [visible, setVisible] = useState(false);
+
   useEffect(() => {
+    // ставим задержку, чтобы CSS transition сработала
+    const timeout = setTimeout(() => setVisible(true), 10);
+
     listBoards()
       .then((res) => setBoards(res || []))
       .finally(() => setLoading(false));
+
+    return () => clearTimeout(timeout);
   }, []);
 
   async function handleLogout() {
@@ -39,8 +46,12 @@ export function AppPage() {
     setCreatingBoard(false);
   }
 
-  return (
-    <div className={styles.pageContainer}>
+    return (
+    <div
+      className={`${styles.pageContainer} ${
+        visible ? styles.pageContainerVisible : ''
+      }`}
+    >
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.userPanel}>
@@ -62,7 +73,7 @@ export function AppPage() {
               className={styles.boardCard}
               onClick={() => navigate(`/boards/${b.id}`)}
             >
-              <TruncatedText text={b.name} className={styles.boardName}/>
+              <TruncatedText text={b.name} className={styles.boardName} />
               <div className={styles.boardUpdated}>
                 updated {new Date(b.updated_at).toLocaleString()}
               </div>
@@ -71,49 +82,51 @@ export function AppPage() {
 
           {/* Add board */}
           <div
-  className={`${styles.addCard} ${
-    creatingBoard ? styles.addCardActive : ''
-  }`}
-  onClick={() => !creatingBoard && setCreatingBoard(true)}
->
-  {/* Текст "+ new board" */}
-  <div
-    className={`${styles.addContent} ${
-      creatingBoard ? styles.addHidden : ''
-    }`}
-  >
-    <div className={styles.addText}>+ new board</div>
-  </div>
+            className={`${styles.addCard} ${
+              creatingBoard ? styles.addCardActive : ''
+            }`}
+            onClick={() => !creatingBoard && setCreatingBoard(true)}
+          >
+            {/* Текст "+ new board" */}
+            <div
+              className={`${styles.addContent} ${
+                creatingBoard ? styles.addHidden : ''
+              }`}
+            >
+              <div className={styles.addText}>+ new board</div>
+            </div>
 
-  {/* Форма */}
-  <div
-    className={`${styles.addContent} ${
-      !creatingBoard ? styles.addHidden : ''
-    }`}
-  >
-    <div className={styles.createForm}>
-      <input
-        autoFocus
-        value={newName}
-        onChange={(e) => setNewName(e.target.value)}
-        placeholder="name"
-        className={styles.input}
-      />
-      <div className={styles.createButtons}>
-        <button onClick={handleCreate} className={styles.circleButton}>
-          ✓
-        </button>
-        <button
-          onClick={() => setCreatingBoard(false)}
-          className={styles.circleButton}
-        >
-          ×
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
+            {/* Форма */}
+            <div
+              className={`${styles.addContent} ${
+                !creatingBoard ? styles.addHidden : ''
+              }`}
+            >
+              <div className={styles.createForm}>
+                <input
+                  autoFocus
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder="name"
+                  className={styles.input}
+                />
+                <div className={styles.createButtons}>
+                  <button
+                    onClick={handleCreate}
+                    className={styles.circleButton}
+                  >
+                    ✓
+                  </button>
+                  <button
+                    onClick={() => setCreatingBoard(false)}
+                    className={styles.circleButton}
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
