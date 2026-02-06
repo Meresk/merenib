@@ -1,0 +1,160 @@
+/* Overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  z-index: 1000;
+}
+
+.overlayVisible {
+  opacity: 1;
+}
+
+/* Модалка */
+.modal {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(6px);
+  border-radius: 16px;
+  padding: 24px 20px;
+  min-height: 140px; /* Минимальная высота */
+  width: 280px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* Центрирование по вертикали */
+  transform: scale(0.97);
+  opacity: 0;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.overlayVisible .modal {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Контент модалки */
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* Центрирование внутри контента */
+  gap: 16px;
+  width: 100%;
+  min-height: 92px; /* Фиксированная минимальная высота контента */
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.hidden {
+  display: none; /* Скрываем вместо opacity */
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.95);
+}
+
+/* Кнопки действий (Update/Delete) - только для default mode */
+.iconButtons {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Круглые кнопки (Update/Delete) */
+.iconButton {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.iconButton:hover {
+  background: rgba(255,255,255,0.12);
+  transform: scale(1.05);
+}
+
+.iconButton:active {
+  transform: scale(0.9);
+}
+
+/* Input */
+.input {
+  width: 100%;
+  max-width: 220px;
+  text-align: center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  color: #fff;
+  outline: none;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+.input:focus {
+  border-color: rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.06);
+}
+
+/* Кнопки ✓ ✕ */
+.buttonRow {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.circleButton {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 16px;
+}
+
+.circleButton:hover {
+  background: rgba(255,255,255,0.12);
+  transform: scale(1.05);
+}
+
+.circleButton:active {
+  transform: scale(0.9);
+}
+
+.circleButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Подтверждение удаления */
+.confirmText {
+  margin: 0;
+  font-size: 15px;
+  text-align: center;
+  color: rgba(255,255,255,0.9);
+}

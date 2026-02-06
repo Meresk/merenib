@@ -6,6 +6,7 @@ import type { Board } from '../api/types';
 import styles from './styles/AppPage.module.css';
 import { TruncatedText } from '../components/TruncatedText';
 import { Loader } from '../components/Loader';
+import { BoardModal } from '../components/modals/BoardModal';
 
 export function AppPage() {
   const navigate = useNavigate();
@@ -18,6 +19,8 @@ export function AppPage() {
   const [newName, setNewName] = useState('');
 
   const [visible, setVisible] = useState(false);
+
+  const [modalBoard, setModalBoard] = useState<Board | null>(null);
 
   useEffect(() => {
     // ставим задержку, чтобы CSS transition сработала
@@ -66,20 +69,44 @@ export function AppPage() {
       </div>
 
       {/* Boards */}
-      
       <div className={styles.boardsGrid}>
-        {boards.map((b) => (
-          <div
-            key={b.id}
-            className={styles.boardCard}
-            onClick={() => navigate(`/boards/${b.id}`)}
-           >
-            <TruncatedText text={b.name} className={styles.boardName} />
-            <div className={styles.boardUpdated}>
-              updated {new Date(b.updated_at).toLocaleString()}
+        {boards.map((b) => {
+          let touchTimeout: ReturnType<typeof setTimeout>;
+
+          const handleTouchStart = (e: React.TouchEvent) => {
+            touchTimeout = setTimeout(() => {
+              setModalBoard(b);
+            }, 800);
+          };
+
+          const handleTouchEnd = (e: React.TouchEvent) => {
+            clearTimeout(touchTimeout);
+          };
+
+          const handleClick = () => {
+            navigate(`/boards/${b.id}`);
+          };
+
+          return (
+            <div
+              key={b.id}
+              className={styles.boardCard}
+              onClick={handleClick}
+              onContextMenu={(e) => {
+                e.preventDefault();
+                setModalBoard(b);
+              }}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+              onTouchMove={handleTouchEnd}
+            >
+              <TruncatedText text={b.name} className={styles.boardName} />
+              <div className={styles.boardUpdated}>
+                updated {new Date(b.updated_at).toLocaleString()}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {/* Add board */}
         <div
@@ -88,23 +115,23 @@ export function AppPage() {
           }`}
           onClick={() => !creatingBoard && setCreatingBoard(true)}
         >
-          {/* Текст "+ new board" */}
+          {/* "new board" */}
           <div
             className={`${styles.addContent} ${
               creatingBoard ? styles.addHidden : ''
             }`}
           >
-             <div className={styles.addText}>+ new board</div>
+            <div className={styles.addText}>+ new board</div>
           </div>
 
-           {/* Форма */}
+          {/* Форма */}
           <div
             className={`${styles.addContent} ${
               !creatingBoard ? styles.addHidden : ''
             }`}
           >
             <div className={styles.createForm}>
-               <input
+              <input
                 autoFocus
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
@@ -112,10 +139,7 @@ export function AppPage() {
                 className={styles.input}
               />
               <div className={styles.createButtons}>
-                <button
-                  onClick={handleCreate}
-                  className={styles.circleButton}
-                >
+                <button onClick={handleCreate} className={styles.circleButton}>
                   ✓
                 </button>
                 <button
@@ -125,10 +149,28 @@ export function AppPage() {
                   ×
                 </button>
               </div>
-          </div>
+            </div>
           </div>
         </div>
-       </div>
+      </div>
+
+      {modalBoard && (
+        <BoardModal
+          boardId={modalBoard.id}
+          boardName={modalBoard.name}
+          onClose={() => setModalBoard(null)}
+          onUpdate={(newName) =>
+            setBoards((prev) =>
+              prev.map((b) =>
+                b.id === modalBoard.id ? { ...b, name: newName } : b
+              )
+            )
+          }
+          onDelete={() =>
+            setBoards((prev) => prev.filter((b) => b.id !== modalBoard.id))
+          }
+        />
+      )}
     </div>
   );
 }
