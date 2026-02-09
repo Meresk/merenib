@@ -35,7 +35,7 @@
   background: rgba(0,0,0,0.5);
 }
 
-/* Раскрытая панель */
+/* Панель */
 .toolbar {
   position: absolute;
   top: 110px; 
@@ -44,7 +44,74 @@
   flex-direction: column;
   gap: 10px; 
   z-index: 10;
+  pointer-events: none; /* запрещаем клики, когда закрыта */
 }
+
+/* Общие стили для кнопок с анимацией */
+.toolbar button {
+  width: 38px;  
+  height: 38px; 
+  background: rgba(0, 0, 0, 0.3);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.2s;
+
+  /* Начальное состояние для анимации */
+  opacity: 0;
+  transform: translateY(-10px) scale(0.8);
+}
+
+/* Эффект при наведении */
+.toolbar button:hover {
+  background: rgba(0, 0, 0, 0.5);
+  transform: scale(1.1);
+}
+
+/* Класс открытия панели */
+.toolbar.open {
+  pointer-events: auto;
+}
+
+.toolbar.open button {
+  animation: slideUpFade 0.3s forwards;
+}
+
+/* Задержки для каждой кнопки (поочерёдно) */
+.toolbar.open button:nth-child(1) {
+  animation-delay: 0s;
+}
+.toolbar.open button:nth-child(2) {
+  animation-delay: 0.08s;
+}
+.toolbar.open button:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+/* Анимация появления */
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Класс закрытия для плавного исчезновения */
+.toolbar.closed button {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.8);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
 
 /* Кнопки внутри панели */
 .toolbar button {
@@ -65,4 +132,17 @@
 .toolbar button:hover {
   background: rgba(0, 0, 0, 0.5);
   transform: scale(1.1);
+}
+
+/* На мобильных — кнопка слева */
+@media (max-width: 768px) {
+  .panelToggle {
+    left: 20px;
+    right: auto; /* убираем правый отступ */
+  }
+
+  .toolbar {
+    right: auto;
+    left: 20px;
+  }
 }
