@@ -9,11 +9,11 @@
   height: 100%;
 }
 
-/* Кнопка раскрытия панели */
+/* ===== КНОПКА ОТКРЫТИЯ/ЗАКРЫТИЯ ПАНЕЛИ ===== */
 .panelToggle {
   position: absolute;
   top: 65px; 
-  right: 20px;
+  right: 30px;
   width: 38px;  
   height: 38px;
   background: rgba(0,0,0,0.3);
@@ -35,19 +35,19 @@
   background: rgba(0,0,0,0.5);
 }
 
-/* Панель */
+/* ===== ОСНОВНАЯ ПАНЕЛЬ ИНСТРУМЕНТОВ ===== */
 .toolbar {
   position: absolute;
   top: 110px; 
-  right: 20px;
+  right: 30px;
   display: flex;
   flex-direction: column;
   gap: 10px; 
   z-index: 10;
-  pointer-events: none; /* запрещаем клики, когда закрыта */
+  pointer-events: none; /* Клики заблокированы когда панель закрыта */
 }
 
-/* Общие стили для кнопок с анимацией */
+/* ===== ОБЩИЕ СТИЛИ ДЛЯ ВСЕХ КНОПОК ===== */
 .toolbar button {
   width: 38px;  
   height: 38px; 
@@ -62,18 +62,20 @@
   justify-content: center;
   transition: background 0.2s, transform 0.2s;
 
-  /* Начальное состояние для анимации */
+  /* Начальное состояние для анимации появления */
   opacity: 0;
   transform: translateY(-10px) scale(0.8);
 }
 
-/* Эффект при наведении */
+/* Эффект при наведении на любую кнопку */
 .toolbar button:hover {
   background: rgba(0, 0, 0, 0.5);
   transform: scale(1.1);
 }
 
-/* Класс открытия панели */
+/* ===== СОСТОЯНИЯ ПАНЕЛИ (ОТКРЫТА/ЗАКРЫТА) ===== */
+
+/* Панель открыта - кнопки видны и кликабельны */
 .toolbar.open {
   pointer-events: auto;
 }
@@ -82,18 +84,19 @@
   animation: slideUpFade 0.3s forwards;
 }
 
-/* Задержки для каждой кнопки (поочерёдно) */
-.toolbar.open button:nth-child(1) {
-  animation-delay: 0s;
-}
-.toolbar.open button:nth-child(2) {
-  animation-delay: 0.08s;
-}
-.toolbar.open button:nth-child(3) {
-  animation-delay: 0.16s;
+/* Панель закрыта - все кнопки скрыты */
+.toolbar.closed button,
+.toolbar.closed .confirmCancelGroup,
+.toolbar.closed .confirmCancelGroup button {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.8);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
 }
 
-/* Анимация появления */
+/* ===== АНИМАЦИИ ===== */
+
+/* Анимация появления кнопок при открытии панели */
 @keyframes slideUpFade {
   from {
     opacity: 0;
@@ -105,44 +108,101 @@
   }
 }
 
-/* Класс закрытия для плавного исчезновения */
-.toolbar.closed button {
-  opacity: 0;
-  transform: translateY(-10px) scale(0.8);
-  transition: opacity 0.2s, transform 0.2s;
-}
+/* Поочерёдное появление кнопок (задержки) */
+.toolbar.open button:nth-child(1) { animation-delay: 0s; }
+.toolbar.open button:nth-child(2) { animation-delay: 0.08s; }
+.toolbar.open button:nth-child(3) { animation-delay: 0.16s; }
 
+/* ===== СПЕЦИАЛЬНЫЕ ЭЛЕМЕНТЫ ДЛЯ КНОПОК SAVE/LOAD ===== */
 
-/* Кнопки внутри панели */
-.toolbar button {
-  width: 38px;  
-  height: 38px; 
-  background: rgba(0, 0, 0, 0.3);
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 18px; 
+/* Контейнер для кнопок с эффектом "митоза" */
+.buttonGroup {
+  position: relative;
+  width: 38px;
+  height: 38px;
   display: flex;
-  align-items: center;
   justify-content: center;
-  transition: background 0.2s, transform 0.2s;
+  align-items: center;
 }
 
-.toolbar button:hover {
-  background: rgba(0, 0, 0, 0.5);
-  transform: scale(1.1);
+/* Горизонтальная группа из двух кнопок (галочка и крестик) */
+.confirmCancelGroup {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 2;
 }
 
-/* На мобильных — кнопка слева */
+/* Анимация "митоза" - появление двух кнопок из одной */
+@keyframes mitosisAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.confirmCancelGroup button {
+  animation: mitosisAppear 0.3s forwards;
+  position: static;
+  opacity: 0;
+  margin: 0;
+}
+
+/* Поочерёдное появление кнопок в группе */
+.confirmCancelGroup button:nth-child(1) { animation-delay: 0.1s; }
+.confirmCancelGroup button:nth-child(2) { animation-delay: 0.2s; }
+
+/* ===== СТИЛИ ДЛЯ КОНКРЕТНЫХ КНОПОК ===== */
+
+/* Кнопка подтверждения (галочка) */
+.confirmButton {
+  background: rgba(46, 125, 50, 0.8) !important; /* Зелёный */
+}
+
+.confirmButton:hover {
+  background: rgba(46, 125, 50, 1) !important;
+}
+
+/* Кнопка отмены (крестик) */
+.cancelButton {
+  background: rgba(211, 47, 47, 0.8) !important; /* Красный */
+}
+
+.cancelButton:hover {
+  background: rgba(211, 47, 47, 1) !important;
+}
+
+/* Спиннер для индикации сохранения */
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== АДАПТИВНОСТЬ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ ===== */
 @media (max-width: 768px) {
   .panelToggle {
-    left: 20px;
-    right: auto; /* убираем правый отступ */
+    left: 30px;
+    right: auto;
   }
 
   .toolbar {
     right: auto;
-    left: 20px;
+    left: 30px;
   }
 }
