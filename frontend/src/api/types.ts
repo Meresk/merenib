@@ -16,5 +16,8 @@ export interface Board {
 }
 
 export interface BoardFull extends Board {
+  id: number;
+  name: string;
   data: string;
+  updated_at: string;
 }
