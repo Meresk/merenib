@@ -4,7 +4,7 @@ import { getBoard, updateBoard } from '../api/boards';
 
 import { Excalidraw } from '@excalidraw/excalidraw';
 import type { ExcalidrawElement } from '@excalidraw/excalidraw/element/types';
-import type { BinaryFiles, ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types';
+import type { BinaryFileData, BinaryFiles, ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types';
 import "@excalidraw/excalidraw/index.css";
 
 import styles from './styles/BoardPage.module.css';
@@ -95,6 +95,8 @@ export function BoardPage() {
     async function init() {
       // грузим локальные данные
       const local = await loadBoardLocal(numericId);
+      console.log(local?.files);
+      console.log(local?.elements);
       if (local) {
         setElements(local.elements || []);
         setFiles(local.files || {});
@@ -118,7 +120,6 @@ export function BoardPage() {
     init();
   }, [id]);
 
-  
   function handleChange(elements: readonly ExcalidrawElement[]) {
     setElements(elements);
 
@@ -132,13 +133,15 @@ export function BoardPage() {
       saveBoardLocal(boardId, {
         elements,
         appState: excalidrawAPI.getAppState(),
-        files: excalidrawAPI.getFiles(),
+        files: { ...files, ...excalidrawAPI.getFiles() },
       });
     }, 5000);
   }
 
   if (loading) return <div>Loading board…</div>;
   if (!boardId) return <div>Board not found</div>;
+
+
 
   return (
     <div className={styles.container}>
@@ -253,4 +256,8 @@ export function BoardPage() {
       </div>
     </div>
   );
+}
+
+function cleanUpBoardFiles(elements: readonly ExcalidrawElement[], files: BinaryFiles) {
+  throw new Error('Function not implemented.');
 }
