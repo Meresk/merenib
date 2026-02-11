@@ -134,7 +134,7 @@ export function BoardPage() {
         appState: excalidrawAPI.getAppState(),
         files: excalidrawAPI.getFiles(),
       });
-    }, 800);
+    }, 5000);
   }
 
   if (loading) return <div>Loading board…</div>;
