@@ -4,6 +4,7 @@ import (
 	"log"
 	"merenib/backend/internal/auth"
 	"merenib/backend/internal/board"
+	boardfiles "merenib/backend/internal/board_files"
 	"merenib/backend/internal/db"
 	"merenib/backend/internal/user"
 
@@ -27,6 +28,7 @@ func Run(cfg Config) {
 	// Handlers
 	userHandler := user.NewHandler()
 	boardHandler := board.NewHandler()
+	boardFilesHandler := boardfiles.NewBoardFilesHandler()
 	authHandler := auth.NewHandler(cfg.JWTSecret)
 	authMiddleware := auth.NewMiddleware(cfg.JWTSecret)
 
@@ -46,13 +48,17 @@ func Run(cfg Config) {
 	userGroup.Put("/:id", userHandler.Update)
 	userGroup.Delete("/:id", userHandler.Delete)
 
-	// Board endpoints (CRUD)
+	// Board endpoints
+	// boards CRUD
 	boardGroup := api.Group("/boards", authMiddleware.RequireLogin)
 	boardGroup.Post("/", boardHandler.Create)
 	boardGroup.Get("/", boardHandler.List)
 	boardGroup.Get("/:id", boardHandler.Get)
 	boardGroup.Put("/:id", boardHandler.Update)
 	boardGroup.Delete("/:id", boardHandler.Delete)
+	// boards files
+	boardGroup.Post("/:id/files", boardFilesHandler.UploadFile)
+	boardGroup.Get("/:id/files/:fileId", boardFilesHandler.GetFile)
 
 	log.Fatal(app.Listen(":" + cfg.Port))
 }

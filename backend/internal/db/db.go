@@ -55,12 +55,27 @@ func createTables() {
 	);
 	`
 
+	boardFilesTable := `
+	CREATE TABLE IF NOT EXISTS board_files (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		board_id INTEGER NOT NULL,
+		file_name TEXT NOT NULL,
+		file_path TEXT NOT NULL,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		FOREIGN KEY(board_id) REFERENCES boards(id) ON DELETE CASCADE
+	);
+	`
+
 	if _, err := DB.Exec(userTable); err != nil {
 		log.Fatalf("failed to create users table: %v", err)
 	}
 
 	if _, err := DB.Exec(boardTable); err != nil {
 		log.Fatalf("failed to create boards table: %v", err)
+	}
+
+	if _, err := DB.Exec(boardFilesTable); err != nil {
+		log.Fatalf("failed to create board_files table: %v", err)
 	}
 }
 

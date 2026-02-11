@@ -2,7 +2,9 @@ package board
 
 import (
 	"database/sql"
+	"fmt"
 	"merenib/backend/internal/db"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -156,6 +158,11 @@ func (h *BoardHandler) Delete(c *fiber.Ctx) error {
 	affected, _ := res.RowsAffected()
 	if affected == 0 {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "board not found"})
+	}
+
+	uploadDir := fmt.Sprintf("./uploads/boards/%s", id)
+	if err := os.RemoveAll(uploadDir); err != nil {
+		fmt.Printf("Failed to remove board files dir %s: %v\n", uploadDir, err)
 	}
 
 	return c.SendStatus(fiber.StatusNoContent)

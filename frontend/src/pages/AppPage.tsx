@@ -73,13 +73,13 @@ export function AppPage() {
         {boards.map((b) => {
           let touchTimeout: ReturnType<typeof setTimeout>;
 
-          const handleTouchStart = (e: React.TouchEvent) => {
+          const handleTouchStart = () => {
             touchTimeout = setTimeout(() => {
               setModalBoard(b);
             }, 800);
           };
 
-          const handleTouchEnd = (e: React.TouchEvent) => {
+          const handleTouchEnd = () => {
             clearTimeout(touchTimeout);
           };
 

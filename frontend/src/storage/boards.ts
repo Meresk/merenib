@@ -1,4 +1,5 @@
 import type { ExcalidrawElement } from '@excalidraw/excalidraw/element/types';
+import type { BinaryFileData } from '@excalidraw/excalidraw/types';
 import { openDB } from 'idb';
 
 const DB_NAME = 'boards-db';
@@ -15,7 +16,7 @@ const dbPromise = openDB(DB_NAME, 1, {
 export type StoredBoard = {
   elements: readonly ExcalidrawElement[];
   appState?: any;
-  files?: Record<string, any>;
+  files?: Record<string, BinaryFileData>;
 };
 
 export async function loadBoardLocal(id: number): Promise<StoredBoard | null> {
@@ -25,6 +26,7 @@ export async function loadBoardLocal(id: number): Promise<StoredBoard | null> {
 
 export async function saveBoardLocal(id: number, data: StoredBoard) {
   const db = await dbPromise;
+  console.log("SAVING", id, data.files, data.elements);
   await db.put(STORE, data, id);
 }
 
