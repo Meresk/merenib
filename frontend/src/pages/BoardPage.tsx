@@ -251,6 +251,7 @@ export function BoardPage() {
 
       <div className={styles.excalidrawWrapper}>
         <Excalidraw
+          key={boardId}
           initialData={{ elements, files }}
           excalidrawAPI={(api) => setExcalidrawAPI(api)}
           onChange={handleChange}
