@@ -1,20 +1,23 @@
 import type { ExcalidrawElement } from '@excalidraw/excalidraw/element/types';
 import type { BinaryFileData } from '@excalidraw/excalidraw/types';
 import { openDB } from 'idb';
-import type { FileId } from '@excalidraw/excalidraw/element/types';
 import type { DataURL } from '@excalidraw/excalidraw/types';
 
 const DB_NAME = 'boards-db';
 const BOARDS_STORE = "boards";
 const FILES_STORE = "files";
 
-const dbPromise = openDB(DB_NAME, 7, {
+const dbPromise = openDB(DB_NAME, 13, {
   upgrade(db) {
     if (!db.objectStoreNames.contains(BOARDS_STORE)) {
       db.createObjectStore(BOARDS_STORE);
     }
     if (!db.objectStoreNames.contains(FILES_STORE)) {
-      db.createObjectStore(FILES_STORE);
+      const store = db.createObjectStore(FILES_STORE, {
+        keyPath: ['boardId', 'fileId']
+      });
+
+      store.createIndex('boardId', 'boardId');
     }
   },
 });
@@ -34,22 +37,44 @@ export async function saveBoardLocal(
 ) {
   const db = await dbPromise;
 
-  // Saving board data
-  await db.put(BOARDS_STORE, {
-    elements: data.elements,
-    appState: data.appState,
-  }, id);
 
-  // Saving files on board
+  const filesToSave: { boardId: number; fileId: string; blob: Blob }[] = [];
   if (data.files) {
     for (const file of Object.values(data.files)) {
       if (!file.dataURL) continue;
 
+      const existing = await db.get(FILES_STORE, [id, file.id]);
+      if (existing) continue;
+
       const blob = await (await fetch(file.dataURL)).blob();
 
-      await db.put(FILES_STORE, blob, `${id}_${file.id}`)
-    };
+      filesToSave.push({
+        boardId: id,
+        fileId: file.id,
+        blob
+      });
+    }
   }
+
+  const tx = db.transaction([BOARDS_STORE, FILES_STORE], 'readwrite');
+
+  // Saving board data
+  await tx.objectStore(BOARDS_STORE).put(
+    {
+      elements: data.elements,
+      appState: data.appState,
+    },
+    id
+  );
+
+  // Saving files on board
+  const filesStore = tx.objectStore(FILES_STORE);
+
+  for (const file of filesToSave) {
+    filesStore.put(file);
+  }
+
+  await tx.done;
 }
 
 export async function loadBoardLocal(id: number): Promise<any | null> {
@@ -60,12 +85,13 @@ export async function loadBoardLocal(id: number): Promise<any | null> {
 
   const files: Record<string, BinaryFileData> = {};
 
-  const keys = await db.getAllKeys(FILES_STORE);
+  const tx = db.transaction(FILES_STORE, 'readonly');
+  const index = tx.store.index('boardId');
 
-  for (const key of keys) {
-    if (!String(key).startsWith(`${id}_`)) continue;
+  const records = await index.getAll(id);
 
-    const blob = await db.get(FILES_STORE, key);
+  for (const record of records) {
+    const blob = record.blob;
 
     const dataURL = await new Promise<string>((resolve) => {
       const reader = new FileReader();
@@ -73,12 +99,10 @@ export async function loadBoardLocal(id: number): Promise<any | null> {
       reader.readAsDataURL(blob);
     }) as DataURL;
 
-    const fileId = String(key).split("_")[1] as FileId;
-    
-    files[fileId] = {
-      id: fileId,
+    files[record.fileId] = {
+      id: record.fileId,
       mimeType: blob.type,
-      dataURL: dataURL,
+      dataURL,
       created: Date.now(),
       lastRetrieved: Date.now(),
     };
@@ -94,13 +118,16 @@ export async function loadBoardLocal(id: number): Promise<any | null> {
 export async function deleteBoardLocal(id: number) {
   const db = await dbPromise;
 
-  await db.delete(BOARDS_STORE, id);
+  const tx = db.transaction([BOARDS_STORE, FILES_STORE], 'readwrite');
 
-  const keys = await db.getAllKeys(FILES_STORE);
+  await tx.objectStore(BOARDS_STORE).delete(id);
+
+  const index = tx.objectStore(FILES_STORE).index('boardId');
+  const keys = await index.getAllKeys(id);
 
   for (const key of keys) {
-    if (String(key).startsWith(`${id}_`)) {
-      await db.delete(FILES_STORE, key);
-    }
+    tx.objectStore(FILES_STORE).delete(key);
   }
+
+  await tx.done;
 }
