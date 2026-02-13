@@ -65,7 +65,11 @@ export function BoardPage() {
       setElements(scene.elements || []);
       setFiles(scene.files || {});
 
-      await saveBoardLocal(b.id, scene);
+      await saveBoardLocal(b.id, {
+        elements: scene.elements,
+        appState: scene.appState,
+        files: scene.files,
+      });
       alert('Board loaded from server!');
     } catch (e) {
       console.error(e);
@@ -95,8 +99,6 @@ export function BoardPage() {
     async function init() {
       // грузим локальные данные
       const local = await loadBoardLocal(numericId);
-      console.log(local?.files);
-      console.log(local?.elements);
       if (local) {
         setElements(local.elements || []);
         setFiles(local.files || {});
@@ -128,12 +130,12 @@ export function BoardPage() {
     if (saveTimeout.current) {
       clearTimeout(saveTimeout.current);
     }
-
+    
     saveTimeout.current = window.setTimeout(() => {
       saveBoardLocal(boardId, {
         elements,
         appState: excalidrawAPI.getAppState(),
-        files: { ...files, ...excalidrawAPI.getFiles() },
+        files: excalidrawAPI.getFiles() ,
       });
     }, 5000);
   }
@@ -256,8 +258,4 @@ export function BoardPage() {
       </div>
     </div>
   );
-}
-
-function cleanUpBoardFiles(elements: readonly ExcalidrawElement[], files: BinaryFiles) {
-  throw new Error('Function not implemented.');
 }
