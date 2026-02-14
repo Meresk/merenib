@@ -6,7 +6,7 @@ import type { Board } from '../api/types';
 import styles from './styles/AppPage.module.css';
 import { TruncatedText } from '../components/TruncatedText';
 import { Loader } from '../components/Loader';
-import { BoardModal } from '../components/modals/BoardModal';
+import { BoardModal } from '../components/modals/AppBoardModal';
 import { deleteBoardLocal, dbPromise } from '../storage/boards';
 
 export function AppPage() {

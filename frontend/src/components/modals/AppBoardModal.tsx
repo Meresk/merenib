@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { updateBoard, deleteBoard, getBoard } from '../../api/boards';
-import styles from './BoardModal.module.css';
+import styles from './AppBoardModal.module.css';
 import { DeleteIcon, DeleteLocalIcon, EditIcon } from '../Icons/Icons';
 
 type Props = {
