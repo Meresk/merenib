@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { updateBoard, deleteBoard, getBoard } from '../../api/boards';
 import styles from './BoardModal.module.css';
+import { DeleteIcon, DeleteLocalIcon, EditIcon } from '../Icons/Icons';
 
 type Props = {
   boardId: number;
@@ -8,10 +9,11 @@ type Props = {
   onClose: () => void;
   onUpdate?: (newName: string) => void;
   onDelete?: () => void;
+  onDeleteLocal?: () => void;
 };
 
-export function BoardModal({ boardId, boardName, onClose, onUpdate, onDelete }: Props) {
-  const [mode, setMode] = useState<'default' | 'edit' | 'delete'>('default');
+export function BoardModal({ boardId, boardName, onClose, onUpdate, onDelete, onDeleteLocal}: Props) {
+  const [mode, setMode] = useState<'default' | 'edit' | 'delete' | 'deleteLocal'>('default');
   const [name, setName] = useState(boardName);
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -55,10 +57,19 @@ return (
       <div className={`${styles.content} ${mode !== 'default' ? styles.hidden : ''}`}>
         <div className={styles.iconButtons}>
           <button onClick={() => setMode('edit')} className={styles.iconButton} title="Update">
-            ✎
+            <EditIcon/>
           </button>
+
+          <button
+            onClick={() => setMode('deleteLocal')}
+            className={styles.iconButton}
+            title="Delete from local storage"
+          >
+            <DeleteLocalIcon/>
+          </button>
+          
           <button onClick={() => setMode('delete')} className={styles.iconButton} title="Delete">
-            🗑
+            <DeleteIcon/>
           </button>
         </div>
       </div>
@@ -95,6 +106,31 @@ return (
           </button>
         </div>
       </div>
+
+      {/* Delete local mode */}
+      <div className={`${styles.content} ${mode !== 'deleteLocal' ? styles.hidden : ''}`}>
+        <p className={styles.confirmText}>Delete from local storage?</p>
+        <div className={styles.buttonRow}>
+          <button
+            onClick={async () => {
+              if (onDeleteLocal) await onDeleteLocal();
+              onClose();
+            }}
+            className={styles.circleButton}
+            disabled={loading}
+          >
+            ✓
+          </button>
+          <button
+            onClick={() => setMode('default')}
+            className={styles.circleButton}
+            disabled={loading}
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 );

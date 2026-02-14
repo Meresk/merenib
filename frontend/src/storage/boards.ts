@@ -7,7 +7,7 @@ const DB_NAME = 'boards-db';
 const BOARDS_STORE = "boards";
 const FILES_STORE = "files";
 
-const dbPromise = openDB(DB_NAME, 13, {
+export const dbPromise = openDB(DB_NAME, 13, {
   upgrade(db) {
     if (!db.objectStoreNames.contains(BOARDS_STORE)) {
       db.createObjectStore(BOARDS_STORE);
