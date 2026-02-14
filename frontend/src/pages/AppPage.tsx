@@ -6,13 +6,16 @@ import type { Board } from '../api/types';
 import styles from './styles/AppPage.module.css';
 import { TruncatedText } from '../components/TruncatedText';
 import { Loader } from '../components/Loader';
-import { BoardModal } from '../components/modals/BoardModal';
+import { BoardModal } from '../components/modals/AppBoardModal';
+import { deleteBoardLocal, dbPromise } from '../storage/boards';
 
 export function AppPage() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 
   const [boards, setBoards] = useState<Board[]>([]);
+  const [localBoards, setLocalBoards] = useState<Set<number>>(new Set());
+
   const [loading, setLoading] = useState(true);
 
   const [creatingBoard, setCreatingBoard] = useState(false);
@@ -23,7 +26,6 @@ export function AppPage() {
   const [modalBoard, setModalBoard] = useState<Board | null>(null);
 
   useEffect(() => {
-    // ставим задержку, чтобы CSS transition сработала
     const timeout = setTimeout(() => setVisible(true), 10);
 
     listBoards()
@@ -37,6 +39,18 @@ export function AppPage() {
     await logout();
     navigate('/');
   }
+
+  useEffect(() => {
+    const fetchLocalBoards = async () => {
+      const db = await dbPromise;
+      const tx = db.transaction('boards', 'readonly');
+      const store = tx.objectStore('boards');
+      const keys = await store.getAllKeys();
+      setLocalBoards(new Set(keys as number[]));
+    };
+    fetchLocalBoards();
+  }, [boards]);
+
 
   async function handleCreate() {
     if (!newName.trim()) return;
@@ -101,9 +115,22 @@ export function AppPage() {
               onTouchMove={handleTouchEnd}
             >
               <TruncatedText text={b.name} className={styles.boardName} />
-              <div className={styles.boardUpdated}>
-                updated {new Date(b.updated_at).toLocaleString()}
+
+              <div className={styles.boardFooter}>
+                <div className={styles.boardUpdated}>
+                  updated {new Date(b.updated_at).toLocaleString()}
+                </div>
+                {localBoards.has(b.id) && (
+                  <div className={styles.localIcon}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                      <ellipse cx="12" cy="6" rx="8" ry="3"/>
+                      <path d="M4 6v12c0 2 3 4 8 4s8-2 8-4V6"/>
+                      <polyline points="9 15 11 17 15 13" strokeWidth="2"/>
+                    </svg>
+                  </div>
+                )}
               </div>
+
             </div>
           );
         })}
@@ -169,6 +196,14 @@ export function AppPage() {
           onDelete={() =>
             setBoards((prev) => prev.filter((b) => b.id !== modalBoard.id))
           }
+          onDeleteLocal={async () => {
+            await deleteBoardLocal(modalBoard.id);
+            setLocalBoards(prev => {
+              const copy = new Set(prev);
+              copy.delete(modalBoard.id);
+              return copy;
+            });
+          }}
         />
       )}
     </div>
