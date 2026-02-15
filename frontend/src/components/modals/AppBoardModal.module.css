@@ -151,10 +151,26 @@
   transform: none !important;
 }
 
-/* Подтверждение удаления */
 .confirmText {
   margin: 0;
   font-size: 15px;
   text-align: center;
   color: rgba(255,255,255,0.9);
+}
+
+.deleteWord {
+  color: rgba(189, 86, 86, 0.755); /* тускло-красный */
+  font-weight: 600;
+}
+
+.inputError {
+  border-color: rgba(252, 46, 46, 0.42);
+  animation: shake 0.15s ease;
+}
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  50% { transform: translateX(2px); }
+  75% { transform: translateX(-2px); }
+  100% { transform: translateX(0); }
 }

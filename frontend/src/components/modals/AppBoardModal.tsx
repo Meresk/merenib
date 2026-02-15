@@ -17,6 +17,8 @@ export function BoardModal({ boardId, boardName, onClose, onUpdate, onDelete, on
   const [name, setName] = useState(boardName);
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [errorNameUpdate, setErrorNameUpdate] = useState(false);
+
 
   useEffect(() => {
     const timeout = setTimeout(() => setVisible(true), 10);
@@ -24,7 +26,11 @@ export function BoardModal({ boardId, boardName, onClose, onUpdate, onDelete, on
   }, []);
 
   async function handleSave() {
-    if (!name.trim()) return;
+    if (!name.trim()) {
+      setErrorNameUpdate(true);
+      return;
+    }
+    setErrorNameUpdate(false);
     setLoading(true);
     try {
       const boardFull = await getBoard(boardId);
@@ -33,6 +39,7 @@ export function BoardModal({ boardId, boardName, onClose, onUpdate, onDelete, on
       setMode('default');
     } finally {
       setLoading(false);
+      onClose();
     }
   }
 
@@ -78,11 +85,16 @@ return (
       <div className={`${styles.content} ${mode !== 'edit' ? styles.hidden : ''}`}>
         <input
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            setName(e.target.value);
+            if (errorNameUpdate && e.target.value.trim()) {
+              setErrorNameUpdate(false);
+            }
+          }}
           placeholder="Board name"
-          className={styles.input}
+          className={`${styles.input} ${errorNameUpdate ? styles.inputError : ''}`}
           disabled={loading}
-          autoFocus // Автофокус при переходе в режим редактирования
+          autoFocus
         />
         <div className={styles.buttonRow}>
           <button onClick={handleSave} className={styles.circleButton} disabled={loading}>
@@ -96,7 +108,8 @@ return (
 
       {/* Delete mode */}
       <div className={`${styles.content} ${mode !== 'delete' ? styles.hidden : ''}`}>
-        <p className={styles.confirmText}>Delete this board?</p>
+        <p className={styles.confirmText}>
+          <span className={styles.deleteWord}>Delete</span> this board?</p>
         <div className={styles.buttonRow}>
           <button onClick={handleDelete} className={styles.circleButton} disabled={loading}>
             ✓
@@ -109,11 +122,12 @@ return (
 
       {/* Delete local mode */}
       <div className={`${styles.content} ${mode !== 'deleteLocal' ? styles.hidden : ''}`}>
-        <p className={styles.confirmText}>Delete from local storage?</p>
+        <p className={styles.confirmText}>
+          <span className={styles.deleteWord}>Delete</span> from local storage?</p>
         <div className={styles.buttonRow}>
           <button
             onClick={async () => {
-              if (onDeleteLocal) await onDeleteLocal();
+              if (onDeleteLocal) onDeleteLocal();
               onClose();
             }}
             className={styles.circleButton}

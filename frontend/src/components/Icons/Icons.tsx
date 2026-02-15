@@ -58,6 +58,7 @@ export const DeleteIcon: React.FC<IconProps> = ({
     fill="none" 
     stroke="currentColor" 
     strokeWidth={strokeWidth}
+    //style={{ color: '#ee7e7e', opacity: 0.8 }}
     {...props}
   >
     <path d="M4 7h16M10 11v6M14 11v6M5 7l1 14h12l1-14M9 3h6v4H9V3z" />
