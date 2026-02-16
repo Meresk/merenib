@@ -155,7 +155,7 @@ func (h *BoardFilesHandler) GetFileIds(c *fiber.Ctx) error {
 	}
 	defer rows.Close()
 
-	var fileIds []string
+	fileIds := make([]string, 0)
 	for rows.Next() {
 		var fileId string
 		if err := rows.Scan(&fileId); err != nil {

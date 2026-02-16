@@ -3,12 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getBoard, updateBoard } from '../api/boards';
 
 import { Excalidraw } from '@excalidraw/excalidraw';
-import type { ExcalidrawElement } from '@excalidraw/excalidraw/element/types';
+import type { ExcalidrawElement, FileId } from '@excalidraw/excalidraw/element/types';
 import type { BinaryFiles, ExcalidrawImperativeAPI, AppState } from '@excalidraw/excalidraw/types';
 import "@excalidraw/excalidraw/index.css";
 
 import styles from './styles/BoardPage.module.css';
 import { loadBoardLocal, saveBoardLocal } from '../storage/boards';
+import { fetchBoardFiles, getFileIds, saveBoardFiles } from '../api/board_files';
+import toast from 'react-hot-toast';
 
 export function BoardPage() {
   const { id } = useParams<{ id: string }>();
@@ -29,10 +31,13 @@ export function BoardPage() {
 
   const saveTimeout = useRef<number | null>(null);
 
-  // Состояния для морфинга кнопок
   const [saveMorph, setSaveMorph] = useState(false);
   const [loadMorph, setLoadMorph] = useState(false);
 
+  const [progress, setProgress] = useState<number | null>(null); // null → скрыт
+
+
+  // INIT
   useEffect(() => {
     if (!id) return;
 
@@ -41,7 +46,7 @@ export function BoardPage() {
     setLoading(true);
 
     async function init() {
-      // грузим локальные данные
+      // local data loading
       const local = await loadBoardLocal(numericId);
       if (local) {
         setElements(local.elements || []);
@@ -52,11 +57,11 @@ export function BoardPage() {
         setFiles({});
       }
 
-      // проверяем доступ на сервере
+      // validate user
       try {
         await getBoard(numericId);
       } catch (err: any) {
-        alert('Access denied or board not found');
+        toast.error('access denied');
         navigate('/app');
         return;
       } finally {
@@ -68,7 +73,9 @@ export function BoardPage() {
   }, [id]);
 
 
-  // Обработчики для кнопок подтверждения
+  /**
+   * Save board data to server
+   */
   const handleConfirmSave = async () => {
     if (!boardId || !excalidrawAPI) return;
 
@@ -77,20 +84,27 @@ export function BoardPage() {
       const scene = {
         elements: excalidrawAPI.getSceneElements(),
         appState: excalidrawAPI.getAppState(),
-        files: excalidrawAPI.getFiles(),
       };
-
+      
+      // scene saving
       await updateBoard(boardId, JSON.stringify(scene));
-      alert('Board saved!');
+
+      // files saving
+      await saveBoardFiles(boardId);
+
+      toast.success('Board saved');
     } catch (e) {
-      alert('Error saving board');
+      toast.error('Error saving board');
       console.error(e);
     } finally {
       setSaving(false);
-      setSaveMorph(false); // Возвращаем к исходному состоянию
+      setSaveMorph(false); 
     }
   };
 
+  /**
+   * get board data from server
+   */
   const handleConfirmLoad = async () => {
     if (!boardId) return;
 
@@ -98,34 +112,43 @@ export function BoardPage() {
     try {
       const b = await getBoard(boardId);
       const scene = JSON.parse(b.data);
+      const filesIds = await getFileIds(boardId);
+      const files = await fetchBoardFiles(boardId, filesIds as FileId[]);
+      const safeAppState = scene.appState || {};
+      if (!Array.isArray(safeAppState.collaborators)) {
+        safeAppState.collaborators = [];
+      }
 
+      // loading board
       setElements(scene.elements || []);
-      setFiles(scene.files || {});
+      setAppState(safeAppState);
+      setFiles(files);
 
+      // local save
       await saveBoardLocal(b.id, {
         elements: scene.elements,
         appState: scene.appState,
-        files: scene.files,
+        files: files,
       });
-      alert('Board loaded from server!');
+
+      toast.success('Board loaded from server');
     } catch (e) {
       console.error(e);
-      alert('Server load failed');
+      toast.error('Server board load failed');
     } finally {
       setLoading(false);
-      setLoadMorph(false); // Возвращаем к исходному состоянию
+      setLoadMorph(false);
     }
   };
 
-  // Обработчики отмены
   const handleCancelSave = () => {
     setSaveMorph(false);
   };
-
   const handleCancelLoad = () => {
     setLoadMorph(false);
   };
 
+  // autosave to IndexedDB
   function handleChange(elements: readonly ExcalidrawElement[]) {
     setElements(elements);
 
@@ -141,7 +164,7 @@ export function BoardPage() {
         appState: excalidrawAPI.getAppState(),
         files: excalidrawAPI.getFiles() ,
       });
-    }, 5000);
+    }, 1000);
   }
 
   if (loading) return <div>Loading board…</div>;
@@ -151,7 +174,7 @@ export function BoardPage() {
 
   return (
     <div className={styles.container}>
-      {/* Кнопка раскрытия панели */}
+      {/* Menu button */}
       <button
         className={styles.panelToggle}
         onClick={() => setPanelOpen(!panelOpen)}
@@ -170,7 +193,7 @@ export function BoardPage() {
       </button>
 
       <div className={`${styles.toolbar} ${panelOpen ? styles.open : styles.closed}`}>
-        {/* Группа кнопок Save */}
+        {/* Save buttons group */}
         <div className={styles.buttonGroup}>
           {saveMorph ? (
             <div className={styles.confirmCancelGroup}>
@@ -210,7 +233,7 @@ export function BoardPage() {
           )}
         </div>
 
-        {/* Группа кнопок Load */}
+        {/* Load buttons group */}
         <div className={styles.buttonGroup}>
           {loadMorph ? (
             <div className={styles.confirmCancelGroup}>
@@ -245,14 +268,15 @@ export function BoardPage() {
           )}
         </div>
 
-        {/* Кнопка Exit */}
+        {/* Exit button */}
         <button onClick={() => navigate(-1)} title="Exit">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
             <path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
           </svg>
         </button>
       </div>
-
+      
+      { /* Excalidraw board */}
       <div className={styles.excalidrawWrapper}>
         <Excalidraw
           key={boardId}
