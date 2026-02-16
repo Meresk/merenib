@@ -216,8 +216,8 @@
 
 /* Открытое состояние — панель */
 .colorMorph.open {
-  width: 50px;
-  height: 170px;
+  width: 120px;
+  height: 300px;
   border-radius: 16px;
   background: rgba(255,255,255,0.08);
 }
@@ -271,4 +271,7 @@
   cursor: pointer;
 }
 
-
+.smallPicker {
+  width: 100% !important;
+  height: 100% !important;
+}

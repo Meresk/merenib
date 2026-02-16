@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import styles from './styles/LoginPage.module.css';
+import { HexColorPicker } from 'react-colorful';
 
 export const LoginPage: React.FC = () => {
   const { user, login } = useAuth();
@@ -130,15 +131,11 @@ export const LoginPage: React.FC = () => {
           className={styles.colorMenuPanel}
           onClick={(e) => e.stopPropagation()} 
         >
-          <div>
-            <label>
-              <input type="color" value={topColor} onChange={(e) => setTopColor(e.target.value)} />
-            </label>
+          <div style={{height: '100px'}}>
+              <HexColorPicker className={styles.smallPicker} color={topColor} onChange={setTopColor} />
           </div>
-          <div>
-            <label>
-              <input type="color" value={bottomColor} onChange={(e) => setBottomColor(e.target.value)} />
-            </label>
+          <div style={{height: '100px'}}>
+              <HexColorPicker className={styles.smallPicker} color={bottomColor} onChange={setBottomColor} />
           </div>
           <button onClick={saveColors}>✓</button>
           <button onClick={() => setColorMenuOpen(false)}>×</button>
