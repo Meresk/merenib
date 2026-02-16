@@ -25,8 +25,6 @@ export const AppBackground: React.FC<AppBackgroundProps> = ({ children, useLight
           <LightPillar
             topColor={topColor}
             bottomColor={bottomColor}
-            // topColor="#8ef971"
-            // bottomColor="#9eb6ff"
             intensity={0.6}
             rotationSpeed={0.2}
             glowAmount={0.001}
