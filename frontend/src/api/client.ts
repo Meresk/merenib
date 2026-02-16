@@ -36,3 +36,19 @@ export async function apiFetch<T>(
 
   return res.json();
 }
+
+export async function apiFetchFile(
+  path: string,
+  options: RequestInit = {}
+): Promise<Blob> {
+  const res = await fetch(API_URL + path, {
+    credentials: "include",
+    ...options,
+  });
+
+  if (!res.ok) {
+    throw new Error(`File request failed: ${res.statusText}`);
+  }
+
+  return res.blob();
+}
