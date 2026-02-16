@@ -131,3 +131,15 @@ export async function deleteBoardLocal(id: number) {
 
   await tx.done;
 }
+
+export async function getBoardFileBlobs(boardId: number): Promise<Record<string, Blob>> {
+  const db = await dbPromise;
+  const index = db.transaction(FILES_STORE, 'readonly').store.index('boardId');
+  const records = await index.getAll(boardId);
+
+  const result: Record<string, Blob> = {};
+  for (const r of records) {
+    result[r.fileId] = r.blob;
+  }
+  return result;
+}

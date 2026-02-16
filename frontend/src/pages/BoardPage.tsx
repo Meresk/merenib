@@ -4,7 +4,7 @@ import { getBoard, updateBoard } from '../api/boards';
 
 import { Excalidraw } from '@excalidraw/excalidraw';
 import type { ExcalidrawElement } from '@excalidraw/excalidraw/element/types';
-import type { BinaryFileData, BinaryFiles, ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types';
+import type { BinaryFiles, ExcalidrawImperativeAPI, AppState } from '@excalidraw/excalidraw/types';
 import "@excalidraw/excalidraw/index.css";
 
 import styles from './styles/BoardPage.module.css';
@@ -18,6 +18,8 @@ export function BoardPage() {
 
   const [elements, setElements] = useState<readonly ExcalidrawElement[]>([]);
   const [files, setFiles] = useState<BinaryFiles>({});
+  const [appState, setAppState] = useState<AppState>();
+  
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -30,6 +32,41 @@ export function BoardPage() {
   // Состояния для морфинга кнопок
   const [saveMorph, setSaveMorph] = useState(false);
   const [loadMorph, setLoadMorph] = useState(false);
+
+  useEffect(() => {
+    if (!id) return;
+
+    const numericId = Number(id);
+    setBoardId(numericId);
+    setLoading(true);
+
+    async function init() {
+      // грузим локальные данные
+      const local = await loadBoardLocal(numericId);
+      if (local) {
+        setElements(local.elements || []);
+        setFiles(local.files || {});
+        setAppState(local.appState)
+      } else {
+        setElements([]);
+        setFiles({});
+      }
+
+      // проверяем доступ на сервере
+      try {
+        await getBoard(numericId);
+      } catch (err: any) {
+        alert('Access denied or board not found');
+        navigate('/app');
+        return;
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    init();
+  }, [id]);
+
 
   // Обработчики для кнопок подтверждения
   const handleConfirmSave = async () => {
@@ -88,39 +125,6 @@ export function BoardPage() {
   const handleCancelLoad = () => {
     setLoadMorph(false);
   };
-
-  useEffect(() => {
-    if (!id) return;
-
-    const numericId = Number(id);
-    setBoardId(numericId);
-    setLoading(true);
-
-    async function init() {
-      // грузим локальные данные
-      const local = await loadBoardLocal(numericId);
-      if (local) {
-        setElements(local.elements || []);
-        setFiles(local.files || {});
-      } else {
-        setElements([]);
-        setFiles({});
-      }
-
-      // проверяем доступ на сервере
-      try {
-        await getBoard(numericId);
-      } catch (err: any) {
-        alert('Access denied or board not found');
-        navigate('/app');
-        return;
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    init();
-  }, [id]);
 
   function handleChange(elements: readonly ExcalidrawElement[]) {
     setElements(elements);
@@ -252,7 +256,7 @@ export function BoardPage() {
       <div className={styles.excalidrawWrapper}>
         <Excalidraw
           key={boardId}
-          initialData={{ elements, files }}
+          initialData={{ elements, files, appState }}
           excalidrawAPI={(api) => setExcalidrawAPI(api)}
           onChange={handleChange}
         />

@@ -3,6 +3,7 @@ package boardfiles
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"merenib/backend/internal/db"
 	"os"
 	"path"
@@ -65,10 +66,7 @@ func (h *BoardFilesHandler) UploadFile(c *fiber.Ctx) error {
 
 	if err == nil {
 		// file already exists
-		return c.JSON(fiber.Map{
-			"id":  fileID,
-			"url": existingPath,
-		})
+		return c.SendStatus(fiber.StatusNoContent)
 	}
 
 	if err != sql.ErrNoRows {
@@ -90,10 +88,12 @@ func (h *BoardFilesHandler) UploadFile(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "server error"})
 	}
 
-	return c.JSON(fiber.Map{
-		"id":  fileID,
-		"url": fmt.Sprintf("/api/boards/%s/files/%s", boardID, fileID),
-	})
+	return c.SendStatus(fiber.StatusNoContent)
+
+	// return c.JSON(fiber.Map{
+	// 	"id":  fileID,
+	// 	"url": fmt.Sprintf("/api/boards/%s/files/%s", boardID, fileID),
+	// })
 }
 
 func (h *BoardFilesHandler) GetFile(c *fiber.Ctx) error {
@@ -122,4 +122,48 @@ func (h *BoardFilesHandler) GetFile(c *fiber.Ctx) error {
 	}
 
 	return c.SendFile(filePath, true) // true → Content-Disposition inline
+}
+
+func (h *BoardFilesHandler) GetFileIds(c *fiber.Ctx) error {
+	boardID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "server error"})
+	}
+	userID := int(c.Locals("user_id").(float64))
+
+	var exists bool
+	err = db.DB.QueryRow(`
+		SELECT EXISTS (
+			SELECT 1 FROM boards WHERE id = ? AND user_id = ?
+		)
+	`, boardID, userID).Scan(&exists)
+
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "server error"})
+	}
+
+	if !exists {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "board not found"})
+	}
+
+	rows, err := db.DB.Query(`
+		SELECT file_id FROM board_files WHERE board_id = ?
+	`, boardID)
+
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "server error"})
+	}
+	defer rows.Close()
+
+	var fileIds []string
+	for rows.Next() {
+		var fileId string
+		if err := rows.Scan(&fileId); err != nil {
+			log.Println("Failed to scan file_id:", err)
+			continue
+		}
+		fileIds = append(fileIds, fileId)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fileIds)
 }
