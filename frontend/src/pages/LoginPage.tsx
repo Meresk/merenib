@@ -14,6 +14,24 @@ export const LoginPage: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
   const [authError, setAuthError] = useState(false);
 
+
+  const [colorMenuOpen, setColorMenuOpen] = useState(false);
+  const [topColor, setTopColor] = useState('#a3dffb');
+  const [bottomColor, setBottomColor] = useState('#9eb6ff');
+
+  useEffect(() => {
+    const storedTop = localStorage.getItem('pillarTopColor');
+    const storedBottom = localStorage.getItem('pillarBottomColor');
+    if (storedTop) setTopColor(storedTop);
+    if (storedBottom) setBottomColor(storedBottom);
+  }, []);
+
+  const saveColors = () => {
+    localStorage.setItem('pillarTopColor', topColor);
+    localStorage.setItem('pillarBottomColor', bottomColor);
+    window.location.reload();
+  };
+
   useEffect(() => {
     if (!user) return;
     
@@ -99,7 +117,33 @@ export const LoginPage: React.FC = () => {
         </form>
       </div>
 
-      <div className={styles.creatortxt}>by. meresk.</div>
+      {/* Подпись/кнопка */}
+      <div
+        className={`${styles.colorMorph} ${colorMenuOpen ? styles.open : ''}`}
+        onClick={() => {
+          if (!colorMenuOpen) setColorMenuOpen(true);
+        }}
+      >
+        <span className={styles.creatortxtLabel}>by. meresk.</span>
+
+        <div
+          className={styles.colorMenuPanel}
+          onClick={(e) => e.stopPropagation()} 
+        >
+          <div>
+            <label>
+              <input type="color" value={topColor} onChange={(e) => setTopColor(e.target.value)} />
+            </label>
+          </div>
+          <div>
+            <label>
+              <input type="color" value={bottomColor} onChange={(e) => setBottomColor(e.target.value)} />
+            </label>
+          </div>
+          <button onClick={saveColors}>✓</button>
+          <button onClick={() => setColorMenuOpen(false)}>×</button>
+        </div>
+      </div>
     </>
   );
 };

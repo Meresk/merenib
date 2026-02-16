@@ -170,6 +170,7 @@
   border-color: rgba(255, 255, 255, 0.12);
 }
 
+
 /* Ошибка инпута */
 .inputError {
   border-color: #923638;
@@ -183,3 +184,91 @@
 .cancelButton:focus {
   outline: none;
 }
+
+/* Контейнер подписи с морфингом */
+.colorMorph {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  width: 70px;
+  height: 20px;
+  border-radius: 7px;
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    width 0.35s ease,
+    height 0.35s ease,
+    border-radius 0.35s ease,
+    background 0.35s ease,
+    border-color 0.25s ease;
+  z-index: 1;
+}
+
+.colorMorph:hover {
+  background: rgba(127, 127, 127, 0.183);
+}
+
+/* Открытое состояние — панель */
+.colorMorph.open {
+  width: 50px;
+  height: 170px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.08);
+}
+
+/* Лейбл (исходная подпись) */
+.creatortxtLabel {
+  font-size: 10px;
+  color: rgba(255,255,255,0.55);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.colorMorph.open .creatortxtLabel {
+  opacity: 0;
+  transform: scale(0.8);
+  pointer-events: none;
+}
+
+/* Панель цветов */
+.colorMenuPanel {
+  position: absolute;
+  inset: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  opacity: 0;
+  transform: translateY(10px) scale(0.95);
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.colorMorph.open .colorMenuPanel {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.colorMenuPanel input[type="color"] {
+  width: 100%;
+  height: 32px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.colorMenuPanel button {
+  padding: 6px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.08);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+
