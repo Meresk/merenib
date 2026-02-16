@@ -34,9 +34,6 @@ export function BoardPage() {
   const [saveMorph, setSaveMorph] = useState(false);
   const [loadMorph, setLoadMorph] = useState(false);
 
-  const [progress, setProgress] = useState<number | null>(null); // null → скрыт
-
-
   // INIT
   useEffect(() => {
     if (!id) return;
