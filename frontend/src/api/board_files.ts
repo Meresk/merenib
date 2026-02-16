@@ -66,6 +66,10 @@ export async function fetchBoardFiles(
   fileIds: FileId[],
   concurrency = DEFAULT_CONCURRENCY
 ): Promise<BinaryFiles> {
+  if (!fileIds || fileIds.length === 0) {
+    return {};
+  }
+  
   const result: BinaryFiles = {};
 
   const tasks = fileIds.map((fileId) => async () => {

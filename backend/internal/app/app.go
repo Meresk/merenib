@@ -59,7 +59,7 @@ func Run(cfg Config) {
 	// boards files
 	boardGroup.Post("/:id/files", boardFilesHandler.UploadFile)
 	boardGroup.Get("/:id/files/:fileId", boardFilesHandler.GetFile)
-	boardGroup.Get("/id/files", boardFilesHandler.GetFileIds)
+	boardGroup.Get("/:id/files", boardFilesHandler.GetFileIds)
 
 	log.Fatal(app.Listen(":" + cfg.Port))
 }
