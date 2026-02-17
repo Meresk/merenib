@@ -2,7 +2,7 @@
 
 ## stack
 backend:
-- golang; fiber, sqlite
+- golang, fiber, sqlite
 
 frontend:
 - react, ts, vite, excalidraw
