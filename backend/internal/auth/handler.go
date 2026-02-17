@@ -77,7 +77,7 @@ func (h *AuthHandler) Logout(c *fiber.Ctx) error {
 		HTTPOnly: true,
 		Path:     "/",
 		Expires:  time.Now().Add(-1 * time.Hour),
-		SameSite: "None",
+		SameSite: "None", // Strict для прода
 		Secure:   false,
 	})
 	return c.SendStatus(fiber.StatusNoContent)

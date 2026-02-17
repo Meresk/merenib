@@ -46,6 +46,9 @@ export function BoardPage() {
       try {
         // Проверяем доступ И получаем данные
         const serverBoard = await getBoard(numericId);
+        const hasServerData =
+          typeof serverBoard.data === "string" &&
+          serverBoard.data.trim() !== "";
 
         // Пробуем загрузить локально
         const local = await loadBoardLocal(numericId);
@@ -56,7 +59,15 @@ export function BoardPage() {
           setAppState(local.appState);
         } else {
           // Если нет локальных — используем serverBoard
-          const scene = JSON.parse(serverBoard.data);
+          let scene;
+
+          try {
+            scene = serverBoard.data
+              ? JSON.parse(serverBoard.data)
+              : { elements: [], appState: {} };
+          } catch {
+            scene = { elements: [], appState: {} };
+          }
 
           const fileIds = await getFileIds(numericId);
           const files = await fetchBoardFiles(numericId, fileIds as FileId[]);
@@ -71,12 +82,12 @@ export function BoardPage() {
           setFiles(files);
 
           await saveBoardLocal(numericId, {
-            elements: scene.elements,
+            elements: scene.elements || [],
             appState: safeAppState,
             files,
           });
-
-          toast.success('Board loaded from server');
+          
+          if (hasServerData) toast.success('Board loaded from server');
         }
 
       } catch (err) {
@@ -88,7 +99,7 @@ export function BoardPage() {
     }
 
     init();
-}, [id]);
+  }, [id]);
 
 
 
