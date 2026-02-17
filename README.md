@@ -1,5 +1,13 @@
 # mere-nib - private excalidraw boards
 
+## stack
+backend:
+- golang; fiber, sqlite
+
+frontend:
+- react, ts, vite, excalidraw
+---
+
 ## / tab
 <img width="2560" height="1393" alt="image" src="https://github.com/user-attachments/assets/4ca5cd8f-22eb-4229-baf0-e207a96c169d" />
 <img width="2560" height="1393" alt="image" src="https://github.com/user-attachments/assets/5b11832f-7d26-4dd3-887b-3101dd6a06fb" />
