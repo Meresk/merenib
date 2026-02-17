@@ -43,31 +43,53 @@ export function BoardPage() {
     setLoading(true);
 
     async function init() {
-      // local data loading
-      const local = await loadBoardLocal(numericId);
-      if (local) {
-        setElements(local.elements || []);
-        setFiles(local.files || {});
-        setAppState(local.appState)
-      } else {
-        setElements([]);
-        setFiles({});
-      }
-
-      // validate user
       try {
-        await getBoard(numericId);
-      } catch (err: any) {
-        toast.error('access denied');
+        // Проверяем доступ И получаем данные
+        const serverBoard = await getBoard(numericId);
+
+        // Пробуем загрузить локально
+        const local = await loadBoardLocal(numericId);
+
+        if (local) {
+          setElements(local.elements || []);
+          setFiles(local.files || {});
+          setAppState(local.appState);
+        } else {
+          // Если нет локальных — используем serverBoard
+          const scene = JSON.parse(serverBoard.data);
+
+          const fileIds = await getFileIds(numericId);
+          const files = await fetchBoardFiles(numericId, fileIds as FileId[]);
+
+          const safeAppState = scene.appState || {};
+          if (!Array.isArray(safeAppState.collaborators)) {
+            safeAppState.collaborators = [];
+          }
+
+          setElements(scene.elements || []);
+          setAppState(safeAppState);
+          setFiles(files);
+
+          await saveBoardLocal(numericId, {
+            elements: scene.elements,
+            appState: safeAppState,
+            files,
+          });
+
+          toast.success('Board loaded from server');
+        }
+
+      } catch (err) {
+        toast.error('Access denied or load failed');
         navigate('/app');
-        return;
       } finally {
         setLoading(false);
       }
     }
 
     init();
-  }, [id]);
+}, [id]);
+
 
 
   /**
