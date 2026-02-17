@@ -57,7 +57,7 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 		Name:     "auth_token",
 		Value:    token,
 		HTTPOnly: true,
-		Secure:   false, // true для https
+		Secure:   true,
 		Path:     "/",
 		Expires:  time.Now().Add(24 * time.Hour),
 		SameSite: "None", // Strict для прода
