@@ -44,6 +44,9 @@ func createTables() {
 	);
 	`
 
+	/*
+	* Excalidraw board table, in data - json scene of excalidraw, without data images
+	 */
 	boardTable := `
 	CREATE TABLE IF NOT EXISTS boards (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -55,6 +58,9 @@ func createTables() {
 	);
 	`
 
+	/*
+	* files on boards table
+	 */
 	boardFilesTable := `
 	CREATE TABLE IF NOT EXISTS board_files (
 		board_id INTEGER NOT NULL,
