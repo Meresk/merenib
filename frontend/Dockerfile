@@ -1,17 +1,25 @@
-# Этап запуска
+FROM node:20-alpine AS build
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm ci
+
+COPY . .
+
+RUN npm run build
+
 FROM nginx:stable-alpine
 
-# Удаляем конфиг по умолчанию
 RUN rm -rf /etc/nginx/conf.d/default.conf
 
-# Копируем скомпилированные файлы фронтенда
-COPY dist /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
 
-# Копируем конфигурацию nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Устанавливаем права
 RUN chown -R nginx:nginx /usr/share/nginx/html
 
 EXPOSE 3000
-CMD [ "nginx", "-g", "daemon off;" ]
+
+CMD ["nginx", "-g", "daemon off;"]

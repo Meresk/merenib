@@ -1,13 +1,55 @@
 # mere-nib - private excalidraw boards
 
-## stack
+A web app with user accounts and multiple private [Excalidraw](https://github.com/excalidraw/excalidraw) boards, stored locally and optionally synced to a server.
+
+## Tech stack
 backend:
-- golang, fiber, sqlite
+- Golang
+- [Fiber](https://github.com/gofiber/fiber)
+- Sqlite
 
 frontend:
-- react, ts, vite, excalidraw
+- React + TypeScript + Vite 
+- IndexedDB
+- [Excalidraw](https://github.com/excalidraw/excalidraw)
 ---
 
+## Architecture
+### Storage model
+- Boards stored locally in IndexedDB
+- Optional manual sync to server
+- Server persists boards per user (SQLite)
+### Data handling
+- Excalidraw scene on server stored as JSON
+- Images stored separately and uploaded independently
+- Optimized to avoid large scene payloads
+
+---
+
+## Run locally
+### Backend
+```
+cd backend
+go mod download
+go run cmd/main.go
+```
+### Frontend
+```
+cd frontend
+npm install
+npm run dev
+```
+
+## Run with docker
+```
+cd frontend
+touch .env - VITE_API_BASE_URL=http://localhost/api
+cd ../deploy
+docker compose up --build
+```
+---
+
+# Screenshots
 ## / tab
 <img width="2560" height="1393" alt="image" src="https://github.com/user-attachments/assets/4ca5cd8f-22eb-4229-baf0-e207a96c169d" />
 <img width="2560" height="1393" alt="image" src="https://github.com/user-attachments/assets/5b11832f-7d26-4dd3-887b-3101dd6a06fb" />
