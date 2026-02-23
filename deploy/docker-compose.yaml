@@ -18,6 +18,8 @@ services:
       context: ../backend
       dockerfile: Dockerfile
     restart: always
+    env_file:
+      - ../backend/.env.example
     networks:
       - mn-net
     expose:
@@ -29,6 +31,8 @@ services:
       context: ../frontend
       dockerfile: Dockerfile
     restart: always
+    env_file:
+      - ../frontend/.env.example
     networks:
       - mn-net
     expose:

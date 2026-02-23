@@ -43,7 +43,7 @@ npm run dev
 ## Run with docker
 ```
 cd frontend
-touch .env - VITE_API_BASE_URL=http://localhost/api
+mv .env.example .env
 cd ../deploy
 docker compose up --build
 ```
