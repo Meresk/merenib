@@ -1,5 +1,7 @@
-/* Общий контейнер (морфинг) */
-.morph {
+/* ===================================== */
+/* LOGIN MORPH CONTAINER */
+/* ===================================== */
+.loginMorph {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -29,20 +31,20 @@
   z-index: 1;
 }
 
-/* Открытое состояние */
-.morph.open {
+.loginMorph.open {
   width: 320px;
   height: 220px;  
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.08);
 }
 
-
-.morph:not(.open) .loginForm {
+.loginMorph:not(.open) .loginForm {
   transition: none;
 }
 
-/* Кнопка */
+
+
+/* ---------- LOGIN BUTTON ---------- */
 .centerButton {
   width: 40px;
   height: 40px;
@@ -62,13 +64,15 @@
   outline: none;
 }
 
-.morph.open .centerButton {
+.loginMorph.open .centerButton {
   opacity: 0;
   transform: scale(0.8);
   pointer-events: none;
 }
 
-/* Форма */
+
+
+/* ---------- LOGIN FORM ---------- */
 .loginForm {
   position: absolute;
   inset: 20px;
@@ -86,8 +90,7 @@
     transform 0.18s ease;
 }
 
-
-.morph.open .loginForm {
+.loginMorph.open .loginForm {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
@@ -113,7 +116,6 @@
   background: rgba(255, 255, 255, 0.06);
 }
 
-
 .loginButton {
   padding: 12px;
   font-size: 15px;
@@ -135,43 +137,7 @@
   outline: none;
 }
 
-/* Подпись */
-.creatortxt {
-  position: fixed;
-  bottom: 12px;
-  right: 12px;
-
-  font-size: 10px;
-  letter-spacing: 0.06em;
-
-  color: rgba(255, 255, 255, 0.55);
-
-  padding: 6px 14px;
-  border-radius: 10px;
-
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(6px);
-
-  border: 1px solid rgba(255, 255, 255, 0.08);
-
-  box-shadow: none;
-
-  user-select: none;
-  cursor: default;
-
-  transition:
-    color 0.2s ease,
-    background 0.2s ease,
-    border-color 0.2s ease;
-}
-.creatortxt:hover {
-  color: rgba(255, 255, 255, 0.75);
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.12);
-}
-
-
-/* Ошибка инпута */
+/* ---------- LOGIN ERROR STATES ---------- */
 .inputError {
   border-color: #923638;
   
@@ -181,11 +147,11 @@
   border-color: #923638;
 }
 
-.cancelButton:focus {
-  outline: none;
-}
 
-/* Контейнер подписи с морфингом */
+
+/* ===================================== */
+/* COLOR MORPH CONTAINER */
+/* ===================================== */
 .colorMorph {
   position: fixed;
   bottom: 12px;
@@ -214,7 +180,6 @@
   background: rgba(127, 127, 127, 0.183);
 }
 
-/* Открытое состояние — панель */
 .colorMorph.open {
   width: 120px;
   height: 300px;
@@ -222,7 +187,7 @@
   background: rgba(255,255,255,0.08);
 }
 
-/* Лейбл (исходная подпись) */
+/* ---------- COLOR LABEL ---------- */
 .creatortxtLabel {
   font-size: 10px;
   color: rgba(255,255,255,0.55);
@@ -235,7 +200,8 @@
   pointer-events: none;
 }
 
-/* Панель цветов */
+
+/* ---------- COLOR PANEL ---------- */
 .colorMenuPanel {
   position: absolute;
   inset: 10px;

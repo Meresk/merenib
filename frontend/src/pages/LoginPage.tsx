@@ -1,38 +1,41 @@
+// React
 import { useState, useEffect } from 'react';
+
+// Libs
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../auth/AuthContext';
-import styles from './styles/LoginPage.module.css';
 import { HexColorPicker } from 'react-colorful';
 
-export const LoginPage: React.FC = () => {
-  const { user, login } = useAuth();
-  const navigate = useNavigate();
+// Auth module
+import { useAuth } from '../auth/AuthContext';
 
+// Styles
+import styles from './styles/LoginPage.module.css';
+
+
+export const LoginPage = () => {
+  // --- auth state
   const [loginValue, setLoginValue] = useState('');
   const [password, setPassword] = useState('');
-  const [open, setOpen] = useState(false);
-
   const [submitted, setSubmitted] = useState(false);
   const [authError, setAuthError] = useState(false);
 
-
+  // --- ui state
+  const [loginFormOpen, setLoginFormOpen] = useState(false);
   const [colorMenuOpen, setColorMenuOpen] = useState(false);
+
+  // --- theme state
   const [topColor, setTopColor] = useState('#a3dffb');
   const [bottomColor, setBottomColor] = useState('#9eb6ff');
 
-  useEffect(() => {
-    const storedTop = localStorage.getItem('pillarTopColor');
-    const storedBottom = localStorage.getItem('pillarBottomColor');
-    if (storedTop) setTopColor(storedTop);
-    if (storedBottom) setBottomColor(storedBottom);
-  }, []);
+  // --- derived
+  const { user, login } = useAuth();
+  const navigate = useNavigate();
+  const loginError = submitted && !loginValue;
+  const passwordError = submitted && !password;
 
-  const saveColors = () => {
-    localStorage.setItem('pillarTopColor', topColor);
-    localStorage.setItem('pillarBottomColor', bottomColor);
-    window.location.reload();
-  };
 
+  // --- effects
+  // if already authorized - redirect to main page
   useEffect(() => {
     if (!user) return;
     
@@ -40,7 +43,23 @@ export const LoginPage: React.FC = () => {
     else navigate('app');
   }, [user, navigate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // if already have variables for background - set them
+  useEffect(() => {
+    const storedTop = localStorage.getItem('pillarTopColor');
+    const storedBottom = localStorage.getItem('pillarBottomColor');
+    if (storedTop) setTopColor(storedTop);
+    if (storedBottom) setBottomColor(storedBottom);
+  }, []);
+
+
+  // --- handlers
+  const handleSaveColors = () => {
+    localStorage.setItem('pillarTopColor', topColor);
+    localStorage.setItem('pillarBottomColor', bottomColor);
+    window.location.reload();
+  };
+
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
     setAuthError(false);
@@ -54,36 +73,52 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const loginError = submitted && !loginValue;
-  const passwordError = submitted && !password;
+  const handleOpenLoginFrom = () => {
+    setLoginFormOpen(true);
+    setSubmitted(false);
+    setAuthError(false);
+  };
+
+  const handleCloseLoginForm = () => {
+    setLoginFormOpen(false);
+    setSubmitted(false);
+    setAuthError(false);
+  };
+
+  const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLoginValue(e.target.value);
+    if (submitted) setSubmitted(false);
+    setAuthError(false);
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    if (submitted) setSubmitted(false);
+    setAuthError(false);
+  };
+
+  const handleOpenColorMenu = () => {
+    if (!colorMenuOpen) setColorMenuOpen(true);
+  };
+
+
 
   return (
     <>
       <div
-        className={`${styles.morph} ${open ? styles.open : ''} ${
+        className={`${styles.loginMorph} ${loginFormOpen ? styles.open : ''} ${
           authError ? styles.formError : ''
         }`}
       >
-        <button
-          className={styles.centerButton}
-          onClick={() => {
-            setOpen(true);
-            setSubmitted(false);
-            setAuthError(false);
-          }}
-        >
-          ?
-        </button>
-
-        <form onSubmit={handleSubmit} className={styles.loginForm}>
+        {/* Center button, open login form */}
+        <button className={styles.centerButton} onClick={handleOpenLoginFrom}>?</button>
+        
+        {/* Login form */}
+        <form onSubmit={handleLoginSubmit} className={styles.loginForm}>
           <input
             placeholder="login"
             value={loginValue}
-            onChange={(e) => {
-              setLoginValue(e.target.value);
-              if (submitted) setSubmitted(false);
-              setAuthError(false);
-            }}
+            onChange={handleLoginChange}
             className={`${styles.loginInput} ${
               loginError ? styles.inputError : ''
             }`}
@@ -92,11 +127,7 @@ export const LoginPage: React.FC = () => {
             type="password"
             placeholder="password"
             value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              if (submitted) setSubmitted(false);
-              setAuthError(false);
-            }}
+            onChange={handlePasswordChange}
             className={`${styles.loginInput} ${
               passwordError ? styles.inputError : ''
             }`}
@@ -104,29 +135,21 @@ export const LoginPage: React.FC = () => {
           <button type="submit" className={styles.loginButton}>
             inlet
           </button>
-          <button
-            type="button"
-            className={styles.cancelButton}
-            onClick={() => {
-              setOpen(false);
-              setSubmitted(false);
-              setAuthError(false);
-            }}
-          >
+          <button type="button" className={styles.cancelButton} onClick={handleCloseLoginForm}>
             outlet
           </button>
         </form>
       </div>
 
-      {/* Подпись/кнопка */}
+      {/* 'change background color button*/}
       <div
         className={`${styles.colorMorph} ${colorMenuOpen ? styles.open : ''}`}
-        onClick={() => {
-          if (!colorMenuOpen) setColorMenuOpen(true);
-        }}
+        onClick={handleOpenColorMenu}
       >
+        {/* signature */}
         <span className={styles.creatortxtLabel}>by. meresk.</span>
-
+        
+        {/* change background form */}
         <div
           className={styles.colorMenuPanel}
           onClick={(e) => e.stopPropagation()} 
@@ -137,7 +160,7 @@ export const LoginPage: React.FC = () => {
           <div style={{height: '100px'}}>
               <HexColorPicker className={styles.smallPicker} color={bottomColor} onChange={setBottomColor} />
           </div>
-          <button onClick={saveColors}>✓</button>
+          <button onClick={handleSaveColors}>✓</button>
           <button onClick={() => setColorMenuOpen(false)}>×</button>
         </div>
       </div>
