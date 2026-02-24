@@ -1,7 +1,7 @@
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { useRef, useState, useEffect } from 'react';
-import styles from './TruncatedText.module.css';
+import styles from './styles/TruncatedText.module.css';
 
 interface TruncatedTextProps {
   text: string;

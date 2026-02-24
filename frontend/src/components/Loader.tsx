@@ -1,5 +1,5 @@
 import { createPortal } from 'react-dom';
-import styles from './Loader.module.css';
+import styles from './styles/Loader.module.css';
 
 export function Loader() {
   return createPortal(
