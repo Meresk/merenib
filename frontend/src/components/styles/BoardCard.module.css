@@ -1,0 +1,43 @@
+.boardCard {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 64px;
+  padding: 16px;  
+  border-radius: 12px;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background 0.25s ease, border 0.25s ease, border-radius 0.25s ease, opacity 0.25s ease;
+}
+
+.boardCard {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.boardCard:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.boardCard > div:first-child,
+.boardName {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- CARD FOOTER ---------- */
+.boardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.boardUpdated,
+.localIcon {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+}

@@ -1,30 +1,45 @@
+// React
 import { useEffect, useState } from 'react';
+
+// Libs
 import { useNavigate } from 'react-router-dom';
+
+// Auth
 import { useAuth } from '../auth/AuthContext';
+
+// API
 import { listBoards, createBoard } from '../api/boards';
 import type { Board } from '../api/types';
-import styles from './styles/AppPage.module.css';
-import { TruncatedText } from '../components/TruncatedText';
+
+// Components
 import { Loader } from '../components/Loader';
 import { BoardModal } from '../components/modals/AppBoardModal';
+
+// Storage
 import { deleteBoardLocal, dbPromise } from '../storage/boards';
 
-export function AppPage() {
-  const navigate = useNavigate();
-  const { user, logout } = useAuth();
+// styles
+import styles from './styles/AppPage.module.css';
+import { BoardCard } from '../components/cards/BoardCard';
+import { AddBoardCard } from '../components/cards/AddBoardCard';
 
+export function AppPage() {
+  // --- data state
   const [boards, setBoards] = useState<Board[]>([]);
   const [localBoards, setLocalBoards] = useState<Set<number>>(new Set());
 
+  // --- ui state
   const [loading, setLoading] = useState(true);
-
-  const [creatingBoard, setCreatingBoard] = useState(false);
-  const [newName, setNewName] = useState('');
-
   const [visible, setVisible] = useState(false);
-
   const [modalBoard, setModalBoard] = useState<Board | null>(null);
 
+  // --- derived
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+
+  // --- effects 
+  // page fade-in + load boards
   useEffect(() => {
     const timeout = setTimeout(() => setVisible(true), 10);
 
@@ -35,11 +50,7 @@ export function AppPage() {
     return () => clearTimeout(timeout);
   }, []);
 
-  async function handleLogout() {
-    await logout();
-    navigate('/');
-  }
-
+  // load local boards info
   useEffect(() => {
     const fetchLocalBoards = async () => {
       const db = await dbPromise;
@@ -52,19 +63,22 @@ export function AppPage() {
   }, [boards]);
 
 
-  async function handleCreate() {
-    if (!newName.trim()) return;
+  // --- handlers
+  async function handleLogout() {
+    await logout();
+    navigate('/');
+  }
 
-    const board = await createBoard(newName.trim());
+  async function handleCreateBoard(name: string) {
+    const board = await createBoard(name);
     setBoards((prev) => [
       { id: board.id, name: board.name, updated_at: new Date().toISOString() },
       ...prev,
     ]);
-    setNewName('');
-    setCreatingBoard(false);
   }
 
-    return (
+
+  return (
     <div
       className={`${styles.pageContainer} ${
         visible ? styles.pageContainerVisible : ''
@@ -82,105 +96,25 @@ export function AppPage() {
         </div>
       </div>
 
-      {/* Boards */}
+      {/* Boards grid*/}
       <div className={styles.boardsGrid}>
-        {boards.map((b) => {
-          let touchTimeout: ReturnType<typeof setTimeout>;
-
-          const handleTouchStart = () => {
-            touchTimeout = setTimeout(() => {
-              setModalBoard(b);
-            }, 800);
-          };
-
-          const handleTouchEnd = () => {
-            clearTimeout(touchTimeout);
-          };
-
-          const handleClick = () => {
-            navigate(`/boards/${b.id}`);
-          };
-
-          return (
-            <div
-              key={b.id}
-              className={styles.boardCard}
-              onClick={handleClick}
-              onContextMenu={(e) => {
-                e.preventDefault();
-                setModalBoard(b);
-              }}
-              onTouchStart={handleTouchStart}
-              onTouchEnd={handleTouchEnd}
-              onTouchMove={handleTouchEnd}
-            >
-              <TruncatedText text={b.name} className={styles.boardName} />
-
-              <div className={styles.boardFooter}>
-                <div className={styles.boardUpdated}>
-                  updated {new Date(b.updated_at).toLocaleString()}
-                </div>
-                {localBoards.has(b.id) && (
-                  <div className={styles.localIcon}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                      <ellipse cx="12" cy="6" rx="8" ry="3"/>
-                      <path d="M4 6v12c0 2 3 4 8 4s8-2 8-4V6"/>
-                      <polyline points="9 15 11 17 15 13" strokeWidth="2"/>
-                    </svg>
-                  </div>
-                )}
-              </div>
-
-            </div>
-          );
-        })}
+        {/* Boards */}
+        {boards.map((b) => (
+          <BoardCard
+            key={b.id}
+            board={b}
+            isLocal={localBoards.has(b.id)}
+            onOpen={(id) => navigate(`/boards/${id}`)}
+            onOpenModal={setModalBoard}
+          />
+        ))}
 
         {/* Add board */}
-        <div
-          className={`${styles.addCard} ${
-            creatingBoard ? styles.addCardActive : ''
-          }`}
-          onClick={() => !creatingBoard && setCreatingBoard(true)}
-        >
-          {/* "new board" */}
-          <div
-            className={`${styles.addContent} ${
-              creatingBoard ? styles.addHidden : ''
-            }`}
-          >
-            <div className={styles.addText}>+ new board</div>
-          </div>
-
-          {/* Форма */}
-          <div
-            className={`${styles.addContent} ${
-              !creatingBoard ? styles.addHidden : ''
-            }`}
-          >
-            <div className={styles.createForm}>
-              <input
-                autoFocus
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                placeholder="name"
-                className={styles.input}
-              />
-              <div className={styles.createButtons}>
-                <button onClick={handleCreate} className={styles.circleButton}>
-                  ✓
-                </button>
-                <button
-                  onClick={() => setCreatingBoard(false)}
-                  className={styles.circleButton}
-                >
-                  ×
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <AddBoardCard onCreate={handleCreateBoard} />
       </div>
 
+      
+      {/* Modal for boards */}
       {modalBoard && (
         <BoardModal
           boardId={modalBoard.id}
