@@ -1,5 +1,5 @@
 // React
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 // Libs
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +10,7 @@ import { useAuth } from '../auth/AuthContext';
 
 // Styles
 import styles from './styles/LoginPage.module.css';
+import { ChangeBackgroundModal } from '../components/modals/ChangeBackgroundModal';
 
 
 export const LoginPage = () => {
@@ -22,6 +23,7 @@ export const LoginPage = () => {
   // --- ui state
   const [loginFormOpen, setLoginFormOpen] = useState(false);
   const [colorMenuOpen, setColorMenuOpen] = useState(false);
+  const [changeBackgroundModalOpen, setChangeBackgroundModalOpen] = useState(false);
 
   // --- theme state
   const [topColor, setTopColor] = useState('#a3dffb');
@@ -32,6 +34,7 @@ export const LoginPage = () => {
   const navigate = useNavigate();
   const loginError = submitted && !loginValue;
   const passwordError = submitted && !password;
+  const touchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 
   // --- effects
@@ -101,6 +104,26 @@ export const LoginPage = () => {
     if (!colorMenuOpen) setColorMenuOpen(true);
   };
 
+  const handleChangeBackgroundModal = () => {
+    if (colorMenuOpen) return;
+    setChangeBackgroundModalOpen(true);
+  }
+
+  const handleTouchStart = () => {
+    if (colorMenuOpen) return;
+
+    touchTimeout.current = setTimeout(() => {
+      handleChangeBackgroundModal();
+    }, 800);
+  };
+
+  const handleTouchEnd = () => {
+    if (touchTimeout.current) {
+      clearTimeout(touchTimeout.current);
+      touchTimeout.current = null;
+    }
+  };
+
 
 
   return (
@@ -145,6 +168,15 @@ export const LoginPage = () => {
       <div
         className={`${styles.colorMorph} ${colorMenuOpen ? styles.open : ''}`}
         onClick={handleOpenColorMenu}
+        onContextMenu={(e) => {
+          if (colorMenuOpen) return;
+          
+          e.preventDefault();
+          handleChangeBackgroundModal();
+        }}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchMove={handleTouchEnd}
       >
         {/* signature */}
         <span className={styles.creatortxtLabel}>by. meresk.</span>
@@ -152,7 +184,7 @@ export const LoginPage = () => {
         {/* change background form */}
         <div
           className={styles.colorMenuPanel}
-          onClick={(e) => e.stopPropagation()} 
+          onClick={(e) => e.stopPropagation()}
         >
           <div style={{height: '100px'}}>
               <HexColorPicker className={styles.smallPicker} color={topColor} onChange={setTopColor} />
@@ -164,6 +196,10 @@ export const LoginPage = () => {
           <button onClick={() => setColorMenuOpen(false)}>×</button>
         </div>
       </div>
+
+      {changeBackgroundModalOpen && (
+        <ChangeBackgroundModal onClose={() => setChangeBackgroundModalOpen(false)} />
+      )}
     </>
   );
 };
