@@ -1,5 +1,5 @@
 // React
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 // Libs
 import { useNavigate } from 'react-router-dom';
@@ -22,6 +22,7 @@ import { deleteBoardLocal, dbPromise } from '../storage/boards';
 import styles from './styles/AppPage.module.css';
 import { BoardCard } from '../components/cards/BoardCard';
 import { AddBoardCard } from '../components/cards/AddBoardCard';
+import { UserModal } from '../components/modals/UserModal';
 
 export function AppPage() {
   // --- data state
@@ -32,10 +33,13 @@ export function AppPage() {
   const [loading, setLoading] = useState(true);
   const [visible, setVisible] = useState(false);
   const [modalBoard, setModalBoard] = useState<Board | null>(null);
+  const [UserModalOpen, setUserModalOpen] = useState(false);
 
   // --- derived
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const touchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
 
 
   // --- effects 
@@ -77,6 +81,23 @@ export function AppPage() {
     ]);
   }
 
+  const handleChangeBackgroundModal = () => {
+    setUserModalOpen(true);
+  }
+
+  const handleTouchStart = () => {
+    touchTimeout.current = setTimeout(() => {
+      handleChangeBackgroundModal();
+    }, 800);
+  };
+
+  const handleTouchEnd = () => {
+    if (touchTimeout.current) {
+      clearTimeout(touchTimeout.current);
+      touchTimeout.current = null;
+    }
+  };
+
 
   return (
     <div
@@ -88,7 +109,16 @@ export function AppPage() {
 
       {/* Header */}
       <div className={styles.header}>
-        <div className={styles.userPanel}>
+        <div 
+          className={styles.userPanel} 
+          onContextMenu={(e) => {
+          
+          e.preventDefault();
+          handleChangeBackgroundModal();
+        }}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchMove={handleTouchEnd}>
           <span className={styles.loggedText}>{user?.login}</span>
           <button className={styles.logoutButton} onClick={handleLogout}>
             Logout
@@ -140,6 +170,8 @@ export function AppPage() {
           }}
         />
       )}
+
+      {UserModalOpen && ( <UserModal onClose={() => setUserModalOpen(false)} /> )}
     </div>
   );
 }

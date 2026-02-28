@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import styles from "./styles/bymereskModal.module.css";
+import styles from "./styles/BymereskModal.module.css";
 
 type Props = {
   onClose: () => void;

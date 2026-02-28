@@ -43,12 +43,11 @@
     opacity 0.2s ease;
 }
 
-.overlayVisible .modal {
-  transform: scale(1);
+.modalVisible {
+  transform: translateY(0) scale(1);
   opacity: 1;
 }
 
-/* Контент модалки */
 .content {
   position: absolute;  
   inset: 0;
