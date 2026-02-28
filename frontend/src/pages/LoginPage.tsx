@@ -10,7 +10,7 @@ import { useAuth } from '../auth/AuthContext';
 
 // Styles
 import styles from './styles/LoginPage.module.css';
-import { BymereskModal } from '../components/modals/bymereskModal';
+import { BymereskModal } from '../components/modals/BymereskModal';
 import { usePillar } from '../components/background/PillarContext';
 import { PowerOffIcon, PowerOnIcon } from '../components/icons/Icons';
 

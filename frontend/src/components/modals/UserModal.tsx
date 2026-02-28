@@ -1,65 +1,54 @@
-import { useState, useEffect } from 'react';
-import { updateBoard, deleteBoard, getBoard } from '../../api/boards';
-import styles from './styles/AppBoardModal.module.css';
-import { DeleteIcon, DeleteLocalIcon, EditIcon } from '../icons/Icons';
+import { useEffect, useState } from "react";
+import styles from "./styles/UserModal.module.css";
+import { DeleteIcon, DeleteLocalIcon, EditIcon } from "../icons/Icons";
 
 type Props = {
-  boardId: number;
-  boardName: string;
   onClose: () => void;
-  onUpdate?: (newName: string) => void;
-  onDelete?: () => void;
-  onDeleteLocal?: () => void;
 };
 
-export function BoardModal({ boardId, boardName, onClose, onUpdate, onDelete, onDeleteLocal}: Props) {
-  const [mode, setMode] = useState<'default' | 'edit' | 'delete' | 'deleteLocal'>('default');
-  const [name, setName] = useState(boardName);
-  const [loading, setLoading] = useState(false);
+export const UserModal = ({ onClose }: Props) => {
   const [visible, setVisible] = useState(false);
+  const [mode, setMode] = useState<'default' | 'edit' | 'delete' | 'deleteLocalData'>('default');
+  const [loading, setLoading] = useState(false);
   const [errorNameUpdate, setErrorNameUpdate] = useState(false);
 
   useEffect(() => {
-    const timeout = setTimeout(() => setVisible(true), 10);
-    return () => clearTimeout(timeout);
-  }, []);
+    const t = setTimeout(() => setVisible(true), 10);
+
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+
+    document.addEventListener("keydown", handleEsc);
+
+    return () => {
+      clearTimeout(t);
+      document.removeEventListener("keydown", handleEsc);
+    };
+  }, [onClose]);
 
   async function handleSave() {
-    if (!name.trim()) {
-      setErrorNameUpdate(true);
-      return;
-    }
-    setErrorNameUpdate(false);
-    setLoading(true);
-    try {
-      const boardFull = await getBoard(boardId);
-      await updateBoard(boardId, boardFull.data, name.trim());
-      onUpdate?.(name.trim());
-      setMode('default');
-    } finally {
-      setLoading(false);
-      onClose();
-    }
+     
   }
-
+  
   async function handleDelete() {
-    setLoading(true);
-    try {
-      await deleteBoard(boardId);
-      onDelete?.();
-      onClose();
-    } finally {
-      setLoading(false);
-    }
+    
   }
 
-return (
-  <div
-    className={`${styles.overlay} ${visible ? styles.overlayVisible : ''}`}
-    onClick={onClose}
-  >
-    <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-      {/* Default mode */}
+  async function handleDeleteLocalData() {
+
+  }
+
+  return (
+    <div
+      className={`${styles.overlay} ${visible ? styles.overlayVisible : ""}`}
+      onClick={onClose}
+    >
+      <div
+        className={`${styles.modal} ${visible ? styles.modalVisible : ""}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Default mode */}
       <div className={`${styles.content} ${mode !== 'default' ? styles.hidden : ''}`}>
         <div className={styles.iconButtons}>
           <button onClick={() => setMode('edit')} className={styles.iconButton} title="Update">
@@ -67,9 +56,9 @@ return (
           </button>
 
           <button
-            onClick={() => setMode('deleteLocal')}
+            onClick={() => setMode('deleteLocalData')}
             className={styles.iconButton}
-            title="Delete from local storage"
+            title="Delete all data from local storage"
           >
             <DeleteLocalIcon/>
           </button>
@@ -83,15 +72,8 @@ return (
       {/* Edit mode */}
       <div className={`${styles.content} ${mode !== 'edit' ? styles.hidden : ''}`}>
         <input
-          value={name}
-          onChange={(e) => {
-            setName(e.target.value);
-            if (errorNameUpdate && e.target.value.trim()) {
-              setErrorNameUpdate(false);
-            }
-          }}
-          placeholder="Board name"
           className={`${styles.input} ${errorNameUpdate ? styles.inputError : ''}`}
+          placeholder="User name"
           disabled={loading}
           autoFocus
         />
@@ -108,7 +90,7 @@ return (
       {/* Delete mode */}
       <div className={`${styles.content} ${mode !== 'delete' ? styles.hidden : ''}`}>
         <p className={styles.confirmText}>
-          <span className={styles.deleteWord}>Delete</span> this board?</p>
+          <span className={styles.deleteWord}>Delete</span> your account?</p>
         <div className={styles.buttonRow}>
           <button onClick={handleDelete} className={styles.circleButton} disabled={loading}>
             ✓
@@ -120,15 +102,12 @@ return (
       </div>
 
       {/* Delete local mode */}
-      <div className={`${styles.content} ${mode !== 'deleteLocal' ? styles.hidden : ''}`}>
+      <div className={`${styles.content} ${mode !== 'deleteLocalData' ? styles.hidden : ''}`}>
         <p className={styles.confirmText}>
-          <span className={styles.deleteWord}>Delete</span> from local storage?</p>
+          <span className={styles.deleteWord}>Delete</span> all data from local storage?</p>
         <div className={styles.buttonRow}>
           <button
-            onClick={async () => {
-              if (onDeleteLocal) onDeleteLocal();
-              onClose();
-            }}
+            onClick={handleDeleteLocalData}
             className={styles.circleButton}
             disabled={loading}
           >
@@ -143,8 +122,7 @@ return (
           </button>
         </div>
       </div>
-
+      </div>
     </div>
-  </div>
-);
-}
+  );
+};
