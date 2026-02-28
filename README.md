@@ -52,7 +52,9 @@ docker compose up --build
 # Screenshots
 ## / tab
 <img width="2560" height="1393" alt="image" src="https://github.com/user-attachments/assets/4ca5cd8f-22eb-4229-baf0-e207a96c169d" />
-<img width="2560" height="1393" alt="image" src="https://github.com/user-attachments/assets/5b11832f-7d26-4dd3-887b-3101dd6a06fb" />
+<img width="2548" height="1398" alt="image" src="https://github.com/user-attachments/assets/f1de04ff-6a77-42c5-8ded-2fc0df1c80dc" />
+<img width="2548" height="1398" alt="image" src="https://github.com/user-attachments/assets/1f35644d-a88f-409a-9c1a-dc687bcba082" />
+
 
 ## dashboard tab
 <img width="2560" height="1393" alt="image" src="https://github.com/user-attachments/assets/54d9359b-6732-4aa0-9f40-68b63da041d1" />
