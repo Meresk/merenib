@@ -329,8 +329,6 @@ const LightPillar: React.FC<LightPillarProps> = ({
       rafRef.current = null;
     };
   }, [
-    topColor,
-    bottomColor,
     intensity,
     rotationSpeed,
     interactive,
@@ -342,6 +340,19 @@ const LightPillar: React.FC<LightPillarProps> = ({
     webGLSupported,
     quality
   ]);
+
+  useEffect(() => {
+    if (!materialRef.current) return;
+
+    const parseColor = (hex: string) => {
+      const color = new THREE.Color(hex);
+      return new THREE.Vector3(color.r, color.g, color.b);
+    };
+
+    materialRef.current.uniforms.uTopColor.value = parseColor(topColor);
+    materialRef.current.uniforms.uBottomColor.value = parseColor(bottomColor);
+
+  }, [topColor, bottomColor]);
 
   if (!webGLSupported) {
     return (

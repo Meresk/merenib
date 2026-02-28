@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import LightPillar from './LightPillar';
+import { usePillar } from './PillarContext';
 
 interface AppBackgroundProps {
   children: React.ReactNode;
@@ -7,20 +8,22 @@ interface AppBackgroundProps {
 }
 
 export const AppBackground: React.FC<AppBackgroundProps> = ({ children, useLightPillar }) => {
-  const [topColor, setTopColor] = useState('#a3dffb');
-  const [bottomColor, setBottomColor] = useState('#9eb6ff');
-
-  // Загружаем цвета из localStorage при монтировании
-  useEffect(() => {
-    const storedTop = localStorage.getItem('pillarTopColor');
-    const storedBottom = localStorage.getItem('pillarBottomColor');
-    if (storedTop) setTopColor(storedTop);
-    if (storedBottom) setBottomColor(storedBottom);
-  }, []);
+  const { enabled, topColor, bottomColor } = usePillar();
 
   return (
-    <div style={{ position: 'relative', width: '100%', minHeight: '100vh', overflow: 'hidden' }}>
-      {useLightPillar && (
+    <div 
+      style={{
+          position: 'relative',
+          width: '100%',
+          minHeight: '100vh',
+          overflow: 'hidden',
+          background: `
+            linear-gradient(to bottom, ${topColor}, ${bottomColor}),
+            radial-gradient(circle at 20% 80%, rgba(255,255,255,0.08), transparent 60%)
+          `,
+      }}
+    >
+      {useLightPillar && enabled && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
           <LightPillar
             topColor={topColor}

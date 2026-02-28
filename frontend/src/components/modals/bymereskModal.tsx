@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import styles from "./styles/ChangeBackgroundModal.module.css";
+import styles from "./styles/bymereskModal.module.css";
 
 type Props = {
   onClose: () => void;
 };
 
-export const ChangeBackgroundModal = ({ onClose }: Props) => {
+export const BymereskModal = ({ onClose }: Props) => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export const ChangeBackgroundModal = ({ onClose }: Props) => {
         className={`${styles.modal} ${visible ? styles.modalVisible : ""}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <button className={styles.circleButton}>0</button>
+        <span style={{color: 'rgba(160, 160, 160, 0.83)'}}>mere-nib by meresk. 2026</span>
       </div>
     </div>
   );

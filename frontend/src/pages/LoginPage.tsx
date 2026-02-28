@@ -10,7 +10,9 @@ import { useAuth } from '../auth/AuthContext';
 
 // Styles
 import styles from './styles/LoginPage.module.css';
-import { ChangeBackgroundModal } from '../components/modals/ChangeBackgroundModal';
+import { BymereskModal } from '../components/modals/bymereskModal';
+import { usePillar } from '../components/background/PillarContext';
+import { PowerOffIcon, PowerOnIcon } from '../components/icons/Icons';
 
 
 export const LoginPage = () => {
@@ -25,16 +27,13 @@ export const LoginPage = () => {
   const [colorMenuOpen, setColorMenuOpen] = useState(false);
   const [changeBackgroundModalOpen, setChangeBackgroundModalOpen] = useState(false);
 
-  // --- theme state
-  const [topColor, setTopColor] = useState('#a3dffb');
-  const [bottomColor, setBottomColor] = useState('#9eb6ff');
-
   // --- derived
   const { user, login } = useAuth();
   const navigate = useNavigate();
   const loginError = submitted && !loginValue;
   const passwordError = submitted && !password;
   const touchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { toggle, enabled, topColor, bottomColor, setTopColor, setBottomColor } = usePillar();
 
 
   // --- effects
@@ -46,22 +45,7 @@ export const LoginPage = () => {
     else navigate('app');
   }, [user, navigate]);
 
-  // if already have variables for background - set them
-  useEffect(() => {
-    const storedTop = localStorage.getItem('pillarTopColor');
-    const storedBottom = localStorage.getItem('pillarBottomColor');
-    if (storedTop) setTopColor(storedTop);
-    if (storedBottom) setBottomColor(storedBottom);
-  }, []);
-
-
   // --- handlers
-  const handleSaveColors = () => {
-    localStorage.setItem('pillarTopColor', topColor);
-    localStorage.setItem('pillarBottomColor', bottomColor);
-    window.location.reload();
-  };
-
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
@@ -192,13 +176,13 @@ export const LoginPage = () => {
           <div style={{height: '100px'}}>
               <HexColorPicker className={styles.smallPicker} color={bottomColor} onChange={setBottomColor} />
           </div>
-          <button onClick={handleSaveColors}>✓</button>
+          <button onClick={toggle}>{enabled ? <PowerOffIcon size={10}/> : <PowerOnIcon size={10}/>}</button>
           <button onClick={() => setColorMenuOpen(false)}>×</button>
         </div>
       </div>
 
       {changeBackgroundModalOpen && (
-        <ChangeBackgroundModal onClose={() => setChangeBackgroundModalOpen(false)} />
+        <BymereskModal onClose={() => setChangeBackgroundModalOpen(false)} />
       )}
     </>
   );

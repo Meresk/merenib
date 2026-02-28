@@ -31,6 +31,9 @@
 
   transform: translateY(12px) scale(0.97);
   opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   transition:
     transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
@@ -40,21 +43,4 @@
 .modalVisible {
   transform: translateY(0) scale(1);
   opacity: 1;
-}
-
-.circleButton {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.1);
-  color: white;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.circleButton:hover {
-  background: rgba(255,255,255,0.2);
-  transform: scale(1.1);
 }
