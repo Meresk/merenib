@@ -65,8 +65,47 @@ export const DeleteIcon: React.FC<IconProps> = ({
   </svg>
 );
 
+export const PowerOnIcon: React.FC<IconProps> = ({ 
+  size = 20, 
+  strokeWidth = 1.8, 
+  ...props 
+}) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth={strokeWidth}
+    {...props}
+  >
+    <path d="M12 2v8M18.4 4.6C20 6.5 21 9 21 12c0 5-4 9-9 9s-9-4-9-9c0-3 1-5.5 2.6-7.4" />
+  </svg>
+);
+
+export const PowerOffIcon: React.FC<IconProps> = ({ 
+  size = 20, 
+  strokeWidth = 1.8, 
+  ...props 
+}) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth={strokeWidth}
+    {...props}
+  >
+    <path d="M12 2v8M18.4 4.6C20 6.5 21 9 21 12c0 5-4 9-9 9s-9-4-9-9c0-3 1-5.5 2.6-7.4" />
+    <line x1="2" y1="22" x2="22" y2="2" strokeWidth="2" />
+  </svg>
+);
+
 export const Icons = {
   Edit: EditIcon,
   DeleteLocal: DeleteLocalIcon,
   Delete: DeleteIcon,
+  PowerOn: PowerOnIcon,
+  PowerOff: PowerOffIcon,
 };
