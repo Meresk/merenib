@@ -41,12 +41,14 @@ func Run(cfg Config) {
 	authGroup.Get("/me", authMiddleware.RequireLogin, authHandler.Me)
 
 	// User endpoints (CRUD)
-	userGroup := api.Group("/users", authMiddleware.RequireLogin, authMiddleware.RequireAdmin)
-	userGroup.Post("/", userHandler.Create)
-	userGroup.Get("/", userHandler.List)
-	userGroup.Get("/:id", userHandler.GetById)
-	userGroup.Put("/:id", userHandler.Update)
-	userGroup.Delete("/:id", userHandler.Delete)
+	// only for admin
+	adminUserGroup := api.Group("/users", authMiddleware.RequireLogin)
+	adminUserGroup.Post("/", authMiddleware.RequireAdmin, userHandler.Create)
+	adminUserGroup.Get("/", authMiddleware.RequireAdmin, userHandler.List)
+	adminUserGroup.Get("/:id", authMiddleware.RequireAdmin, userHandler.GetById)
+	// for user and admin
+	adminUserGroup.Put("/:id", authMiddleware.RequireUserAccess, userHandler.Update)
+	adminUserGroup.Delete("/:id", authMiddleware.RequireUserAccess, userHandler.Delete)
 
 	// Board endpoints
 	// boards CRUD

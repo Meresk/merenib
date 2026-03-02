@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
@@ -41,9 +42,13 @@ func (m *AuthMiddleware) RequireLogin(c *fiber.Ctx) error {
 		return c.Status(401).JSON(fiber.Map{"error": "invalid token claims"})
 	}
 
-	c.Locals("user_id", claims["user_id"])
-	c.Locals("login", claims["sub"])
-	c.Locals("is_admin", claims["is_admin"])
+	userID := int(claims["user_id"].(float64))
+	isAdmin := claims["is_admin"].(bool)
+	login := claims["sub"].(string)
+
+	c.Locals("user_id", userID)
+	c.Locals("is_admin", isAdmin)
+	c.Locals("login", login)
 
 	return c.Next()
 }
@@ -57,4 +62,20 @@ func (m *AuthMiddleware) RequireAdmin(c *fiber.Ctx) error {
 	}
 
 	return c.Next()
+}
+
+func (m *AuthMiddleware) RequireUserAccess(c *fiber.Ctx) error {
+	curUserID := c.Locals("user_id").(int)
+	isAdmin := c.Locals("is_admin").(bool)
+
+	paramID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.SendStatus(fiber.StatusBadRequest)
+	}
+
+	if isAdmin || curUserID == paramID {
+		return c.Next()
+	}
+
+	return c.SendStatus(fiber.StatusForbidden)
 }
