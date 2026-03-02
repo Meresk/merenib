@@ -171,6 +171,7 @@ export function AppPage() {
         />
       )}
 
+      {/* Modal for user account */}
       {UserModalOpen && ( <UserModal onClose={() => setUserModalOpen(false)} /> )}
     </div>
   );

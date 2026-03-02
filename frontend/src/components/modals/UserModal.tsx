@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import styles from "./styles/UserModal.module.css";
 import { DeleteIcon, DeleteLocalIcon, EditIcon } from "../icons/Icons";
+import { updateUser } from "../../api/users";
+import { me } from "../../api/auth";
 
 type Props = {
   onClose: () => void;
@@ -11,6 +13,9 @@ export const UserModal = ({ onClose }: Props) => {
   const [mode, setMode] = useState<'default' | 'edit' | 'delete' | 'deleteLocalData'>('default');
   const [loading, setLoading] = useState(false);
   const [errorNameUpdate, setErrorNameUpdate] = useState(false);
+
+  const [editLogin, setEditLogin] = useState("");
+  const [editPassword, setEditPassword] = useState("");
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 10);
@@ -28,7 +33,15 @@ export const UserModal = ({ onClose }: Props) => {
   }, [onClose]);
 
   async function handleSave() {
-     
+     try {
+      const curUser = await me();
+      await updateUser(curUser.id, {
+        login: editLogin,
+        password: editPassword || undefined
+      });
+     } catch (err) {
+        console.error(err);
+     }
   }
   
   async function handleDelete() {
@@ -73,9 +86,17 @@ export const UserModal = ({ onClose }: Props) => {
       <div className={`${styles.content} ${mode !== 'edit' ? styles.hidden : ''}`}>
         <input
           className={`${styles.input} ${errorNameUpdate ? styles.inputError : ''}`}
-          placeholder="User name"
+          placeholder="login"
           disabled={loading}
           autoFocus
+          value={editLogin}
+        />
+        <input
+          className={styles.input}
+          placeholder="password"
+          disabled={loading}
+          autoFocus
+          value={editPassword}
         />
         <div className={styles.buttonRow}>
           <button onClick={handleSave} className={styles.circleButton} disabled={loading}>
