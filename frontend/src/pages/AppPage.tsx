@@ -172,7 +172,7 @@ export function AppPage() {
       )}
 
       {/* Modal for user account */}
-      {UserModalOpen && ( <UserModal onClose={() => setUserModalOpen(false)} /> )}
+      {UserModalOpen && ( <UserModal onClose={() => setUserModalOpen(false)} Login={user?.login} /> )}
     </div>
   );
 }

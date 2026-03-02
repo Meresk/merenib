@@ -6,6 +6,7 @@ import { me } from "../../api/auth";
 
 type Props = {
   onClose: () => void;
+  Login: string | undefined
 };
 
 export const UserModal = ({ onClose }: Props) => {
@@ -90,6 +91,7 @@ export const UserModal = ({ onClose }: Props) => {
           disabled={loading}
           autoFocus
           value={editLogin}
+          onChange={(e) => setEditLogin(e.target.value)}
         />
         <input
           className={styles.input}
@@ -97,6 +99,7 @@ export const UserModal = ({ onClose }: Props) => {
           disabled={loading}
           autoFocus
           value={editPassword}
+          onChange={(e) => setEditPassword(e.target.value)}
         />
         <div className={styles.buttonRow}>
           <button onClick={handleSave} className={styles.circleButton} disabled={loading}>
