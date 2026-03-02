@@ -23,7 +23,7 @@ func (h *BoardFilesHandler) UploadFile(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "server error"})
 	}
-	userID := int(c.Locals("user_id").(float64))
+	userID := c.Locals("user_id").(int)
 
 	// check exists board and user access
 	var exists int
@@ -103,7 +103,7 @@ func (h *BoardFilesHandler) GetFile(c *fiber.Ctx) error {
 	}
 
 	fileID := c.Params("fileId")
-	userID := int(c.Locals("user_id").(float64))
+	userID := c.Locals("user_id").(int)
 
 	// check file and user access
 	var filePath string
@@ -129,7 +129,7 @@ func (h *BoardFilesHandler) GetFileIds(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "server error"})
 	}
-	userID := int(c.Locals("user_id").(float64))
+	userID := c.Locals("user_id").(int)
 
 	var exists bool
 	err = db.DB.QueryRow(`
