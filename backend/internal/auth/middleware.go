@@ -42,9 +42,18 @@ func (m *AuthMiddleware) RequireLogin(c *fiber.Ctx) error {
 		return c.Status(401).JSON(fiber.Map{"error": "invalid token claims"})
 	}
 
-	userID := int(claims["user_id"].(float64))
-	isAdmin := claims["is_admin"].(bool)
-	login := claims["sub"].(string)
+	userID := 0
+	switch v := claims["user_id"].(type) {
+	case float64:
+		userID = int(v)
+	case int:
+		userID = v
+	default:
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "invalid user_id"})
+	}
+
+	isAdmin, _ := claims["is_admin"].(bool)
+	login, _ := claims["sub"].(string)
 
 	c.Locals("user_id", userID)
 	c.Locals("is_admin", isAdmin)
