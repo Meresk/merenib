@@ -143,3 +143,14 @@ export async function getBoardFileBlobs(boardId: number): Promise<Record<string,
   }
   return result;
 }
+
+export async function clearAllUserData() {
+  const db = await dbPromise;
+
+  const tx = db.transaction([BOARDS_STORE, FILES_STORE], 'readwrite');
+
+  await tx.objectStore(BOARDS_STORE).clear();
+  await tx.objectStore(FILES_STORE).clear();
+
+  await tx.done;
+}

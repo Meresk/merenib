@@ -2,8 +2,10 @@ package user
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"merenib/backend/internal/db"
+	"os"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -170,6 +172,30 @@ func (h *UserHandler) Update(c *fiber.Ctx) error {
 
 func (h *UserHandler) Delete(c *fiber.Ctx) error {
 	id := c.Params("id")
+
+	// get all users boards ids
+	rows, err := db.DB.Query(`SELECT id FROM boards WHERE user_id = ?`, id)
+	if err != nil {
+		log.Println("db error:", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "server error"})
+	}
+	defer rows.Close()
+
+	var boardIDs []int
+	for rows.Next() {
+		var boardID int
+		if err := rows.Scan(&boardID); err == nil {
+			boardIDs = append(boardIDs, boardID)
+		}
+	}
+
+	// remove all dirs of deleted user
+	for _, boardID := range boardIDs {
+		dir := fmt.Sprintf("./uploads/boards/%d", boardID)
+		if err := os.RemoveAll(dir); err != nil {
+			log.Printf("failed to remove dir %s: %v\n", dir, err)
+		}
+	}
 
 	res, err := db.DB.Exec("DELETE FROM users WHERE id = ?", id)
 	if err != nil {

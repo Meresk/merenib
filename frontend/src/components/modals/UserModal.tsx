@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
 import styles from "./styles/UserModal.module.css";
 import { DeleteIcon, DeleteLocalIcon, EditIcon } from "../icons/Icons";
-import { updateUser } from "../../api/users";
-import { me } from "../../api/auth";
+import { deleteUser, updateUser } from "../../api/users";
+import { useAuth } from "../../auth/AuthContext";
+import { logout } from "../../api/auth";
+import { clearAllUserData } from "../../storage/boards";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   onClose: () => void;
-  Login: string | undefined
+  onLocalDataCleared?: () => void
 };
 
-export const UserModal = ({ onClose }: Props) => {
+export const UserModal = ({ onClose, onLocalDataCleared }: Props) => {
   const [visible, setVisible] = useState(false);
   const [mode, setMode] = useState<'default' | 'edit' | 'delete' | 'deleteLocalData'>('default');
   const [loading, setLoading] = useState(false);
@@ -17,6 +20,10 @@ export const UserModal = ({ onClose }: Props) => {
 
   const [editLogin, setEditLogin] = useState("");
   const [editPassword, setEditPassword] = useState("");
+
+  const navigate = useNavigate();
+
+  const { user, refreshUser } = useAuth();
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 10);
@@ -33,24 +40,71 @@ export const UserModal = ({ onClose }: Props) => {
     };
   }, [onClose]);
 
+  useEffect(() => {
+    if (user?.login) {
+      setEditLogin(user.login);
+    }
+  }, [user]);
+
   async function handleSave() {
-     try {
-      const curUser = await me();
-      await updateUser(curUser.id, {
-        login: editLogin,
-        password: editPassword || undefined
+    try {
+      setLoading(true);
+
+      await updateUser(user!.id, {
+        login: editLogin !== user?.login ? editLogin : undefined,
+        password: editPassword || undefined,
       });
-     } catch (err) {
-        console.error(err);
-     }
+
+      await refreshUser();
+      onClose();
+
+    } catch (err) {
+      console.error(err);
+      setErrorNameUpdate(true);
+    } finally {
+      setLoading(false);
+    }
   }
   
   async function handleDelete() {
-    
+    try {
+      setLoading(true);
+
+      // удаление пользователя
+      await deleteUser(user!.id);
+      // удаление локальной базы пользователя
+      await clearAllUserData();
+      // логаут
+      await logout();
+
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 0);
+
+      onClose();
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleDeleteLocalData() {
+    try {
+      setLoading(true);
+      // удаление локальной базы пользователя
+      await clearAllUserData();
+      // обновление state чтобы иконки что доски есть в indexedDB не отображались
+      onLocalDataCleared?.();
 
+      onClose();
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (

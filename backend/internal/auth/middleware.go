@@ -1,7 +1,9 @@
 package auth
 
 import (
+	"database/sql"
 	"errors"
+	"merenib/backend/internal/db"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -52,19 +54,21 @@ func (m *AuthMiddleware) RequireLogin(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "invalid user_id"})
 	}
 
-	isAdmin, _ := claims["is_admin"].(bool)
-	login, _ := claims["sub"].(string)
-
 	c.Locals("user_id", userID)
-	c.Locals("is_admin", isAdmin)
-	c.Locals("login", login)
 
 	return c.Next()
 }
 
 func (m *AuthMiddleware) RequireAdmin(c *fiber.Ctx) error {
-	isAdmin, ok := c.Locals("is_admin").(bool)
-	if !ok || !isAdmin {
+	userID := c.Locals("user_id").(int)
+
+	var isAdmin bool
+	err := db.DB.QueryRow(
+		"SELECT is_admin FROM users WHERE id = ?",
+		userID,
+	).Scan(&isAdmin)
+
+	if err != nil || !isAdmin {
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
 			"error": "admin access required",
 		})
@@ -75,10 +79,17 @@ func (m *AuthMiddleware) RequireAdmin(c *fiber.Ctx) error {
 
 func (m *AuthMiddleware) RequireUserAccess(c *fiber.Ctx) error {
 	curUserID := c.Locals("user_id").(int)
-	isAdmin := c.Locals("is_admin").(bool)
-
-	paramID, err := strconv.Atoi(c.Params("id"))
+	var isAdmin bool
+	err := db.DB.QueryRow("SELECT is_admin FROM users WHERE id = ?", curUserID).Scan(&isAdmin)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "user not found"})
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "db error"})
+	}
+
+	paramID, convErr := strconv.Atoi(c.Params("id"))
+	if convErr != nil {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 

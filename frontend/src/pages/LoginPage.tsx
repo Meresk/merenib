@@ -39,10 +39,10 @@ export const LoginPage = () => {
   // --- effects
   // if already authorized - redirect to main page
   useEffect(() => {
-    if (!user) return;
-    
-    if (user.is_admin) navigate('/dashboard')
-    else navigate('app');
+    if (user) {
+      if (user.is_admin) navigate('/dashboard', { replace: true });
+      else navigate('/app', { replace: true });
+    }
   }, [user, navigate]);
 
   // --- handlers
