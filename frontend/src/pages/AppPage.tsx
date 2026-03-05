@@ -171,7 +171,8 @@ export function AppPage() {
         />
       )}
 
-      {UserModalOpen && ( <UserModal onClose={() => setUserModalOpen(false)} /> )}
+      {/* Modal for user account */}
+      {UserModalOpen && ( <UserModal onClose={() => setUserModalOpen(false)} onLocalDataCleared={() => setLocalBoards(new Set())}/> )}
     </div>
   );
 }

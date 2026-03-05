@@ -37,7 +37,7 @@ func (h *BoardHandler) Create(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "name required"})
 	}
 
-	userID := int(c.Locals("user_id").(float64))
+	userID := c.Locals("user_id").(int)
 
 	res, err := db.DB.Exec(
 		`INSERT INTO boards (user_id, name, data) VALUES (?, ?, ?)`,
@@ -58,7 +58,7 @@ func (h *BoardHandler) Create(c *fiber.Ctx) error {
 }
 
 func (h *BoardHandler) List(c *fiber.Ctx) error {
-	userID := int(c.Locals("user_id").(float64))
+	userID := c.Locals("user_id").(int)
 
 	rows, err := db.DB.Query(
 		`SELECT id, name, updated_at
@@ -86,7 +86,7 @@ func (h *BoardHandler) List(c *fiber.Ctx) error {
 
 func (h *BoardHandler) Get(c *fiber.Ctx) error {
 	id := c.Params("id")
-	userID := int(c.Locals("user_id").(float64))
+	userID := c.Locals("user_id").(int)
 
 	var b Board
 	err := db.DB.QueryRow(
@@ -108,7 +108,7 @@ func (h *BoardHandler) Get(c *fiber.Ctx) error {
 
 func (h *BoardHandler) Update(c *fiber.Ctx) error {
 	id := c.Params("id")
-	userID := int(c.Locals("user_id").(float64))
+	userID := c.Locals("user_id").(int)
 
 	var input struct {
 		Name string `json:"name"`
@@ -144,7 +144,7 @@ func (h *BoardHandler) Update(c *fiber.Ctx) error {
 
 func (h *BoardHandler) Delete(c *fiber.Ctx) error {
 	id := c.Params("id")
-	userID := int(c.Locals("user_id").(float64))
+	userID := c.Locals("user_id").(int)
 
 	res, err := db.DB.Exec(
 		`DELETE FROM boards WHERE id = ? AND user_id = ?`,

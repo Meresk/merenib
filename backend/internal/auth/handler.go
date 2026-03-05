@@ -48,7 +48,7 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 		})
 	}
 
-	token, err := h.generateToken(id, input.Login, isAdmin)
+	token, err := h.generateToken(id)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "cannot create token"})
 	}
@@ -84,20 +84,37 @@ func (h *AuthHandler) Logout(c *fiber.Ctx) error {
 }
 
 func (h *AuthHandler) Me(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{
-		"id":       c.Locals("user_id"),
-		"login":    c.Locals("login"),
-		"is_admin": c.Locals("is_admin"),
+	userID := c.Locals("user_id").(int)
+
+	var user struct {
+		ID      int
+		Login   string
+		IsAdmin bool
+	}
+
+	err := db.DB.QueryRow(
+		"SELECT id, login, is_admin FROM users WHERE id = ?",
+		userID,
+	).Scan(&user.ID, &user.Login, &user.IsAdmin)
+
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "user not found",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"id":       user.ID,
+		"login":    user.Login,
+		"is_admin": user.IsAdmin,
 	})
 }
 
-func (h *AuthHandler) generateToken(id int, login string, isAdmin bool) (string, error) {
+func (h *AuthHandler) generateToken(id int) (string, error) {
 	claims := jwt.MapClaims{
-		"sub":      login,
-		"user_id":  id,
-		"is_admin": isAdmin,
-		"exp":      time.Now().Add(time.Hour * 2).Unix(),
-		"iat":      time.Now().Unix(),
+		"user_id": id,
+		"exp":     time.Now().Add(time.Hour * 2).Unix(),
+		"iat":     time.Now().Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

@@ -28,6 +28,10 @@ func Init(dbPath, defAdminPassword string) {
 		log.Fatalf("failed to ping db: %v", err)
 	}
 
+	if _, err := DB.Exec("PRAGMA foreign_keys = ON;"); err != nil {
+		log.Fatalf("failed to enable foreign keys: %v", err)
+	}
+
 	createTables()
 	seedAdmin(defAdminPassword)
 	log.Println("✅ database initialized")
@@ -54,7 +58,7 @@ func createTables() {
 		name TEXT NOT NULL,
 		data TEXT NOT NULL,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-		FOREIGN KEY(user_id) REFERENCES users(id)
+		FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 	);
 	`
 
