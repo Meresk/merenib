@@ -11,6 +11,7 @@ import styles from './styles/BoardPage.module.css';
 import { loadBoardLocal, saveBoardLocal } from '../storage/boards';
 import { fetchBoardFiles, getFileIds, saveBoardFiles } from '../api/board_files';
 import toast from 'react-hot-toast';
+import { Loader } from '../components/Loader';
 
 export function BoardPage() {
   const { id } = useParams<{ id: string }>();
@@ -116,11 +117,11 @@ export function BoardPage() {
         appState: excalidrawAPI.getAppState(),
       };
       
-      // scene saving
-      await updateBoard(boardId, JSON.stringify(scene));
-
       // files saving
       await saveBoardFiles(boardId);
+
+      // scene saving
+      await updateBoard(boardId, JSON.stringify(scene));
 
       toast.success('Board saved');
     } catch (e) {
@@ -197,9 +198,9 @@ export function BoardPage() {
     }, 1000);
   }
 
-  if (loading) return <div>Loading board…</div>;
+  // must have. We must load excalidraw board AFTER get all data
+  if (loading) return <Loader />;
   if (!boardId) return <div>Board not found</div>;
-
 
 
   return (
