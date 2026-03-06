@@ -112,16 +112,22 @@ export function BoardPage() {
 
     setSaving(true);
     try {
-      const scene = {
-        elements: excalidrawAPI.getSceneElements(),
-        appState: excalidrawAPI.getAppState(),
-      };
+      const elements = excalidrawAPI.getSceneElements();
+      const appState = excalidrawAPI.getAppState();
+      const files = excalidrawAPI.getFiles();
+
+      // local saving 
+      await saveBoardLocal(boardId, {
+        elements,
+        appState,
+        files,
+      });
       
-      // files saving
+      // files saving to server
       await saveBoardFiles(boardId);
 
-      // scene saving
-      await updateBoard(boardId, JSON.stringify(scene));
+      // scene saving to server
+      await updateBoard(boardId, JSON.stringify({ elements, appState }));
 
       toast.success('Board saved');
     } catch (e) {
@@ -315,6 +321,13 @@ export function BoardPage() {
           excalidrawAPI={(api) => setExcalidrawAPI(api)}
           onChange={handleChange}
         />
+
+        {/* When saving to server - lock excalidraw and printing loader */}
+        {saving && (
+          <div className={styles.overlayLoader}>
+            <Loader />
+          </div>
+        )}
       </div>
     </div>
   );
