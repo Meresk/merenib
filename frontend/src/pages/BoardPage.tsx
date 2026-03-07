@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { getBoard, updateBoard } from '../api/boards';
 
 import { Excalidraw } from '@excalidraw/excalidraw';
@@ -23,7 +23,6 @@ export function BoardPage() {
   const [files, setFiles] = useState<BinaryFiles>({});
   const [appState, setAppState] = useState<AppState>();
   
-
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -35,6 +34,9 @@ export function BoardPage() {
   const [saveMorph, setSaveMorph] = useState(false);
   const [loadMorph, setLoadMorph] = useState(false);
 
+  const location = useLocation();
+  const importedScene = location.state?.importedScene;
+
   // INIT
   useEffect(() => {
     if (!id) return;
@@ -45,52 +47,63 @@ export function BoardPage() {
 
     async function init() {
       try {
-        // Проверяем доступ И получаем данные
-        const serverBoard = await getBoard(numericId);
-        const hasServerData =
-          typeof serverBoard.data === "string" &&
-          serverBoard.data.trim() !== "";
+        if (importedScene) {
+          // подгружаем импортированную доску
+          setElements(importedScene.elements || []);
+          setAppState(importedScene.appState || {});
+          setFiles(importedScene.files || {});
 
-        // Пробуем загрузить локально
-        const local = await loadBoardLocal(numericId);
+          // сохраняем локально
+          await saveBoardLocal(numericId, importedScene);
 
-        if (local) {
-          setElements(local.elements || []);
-          setFiles(local.files || {});
-          setAppState(local.appState);
+          toast.success('Board imported successfully');
         } else {
-          // Если нет локальных — используем serverBoard
-          let scene;
+          // Проверяем доступ и получаем данные
+          const serverBoard = await getBoard(numericId);
+          const hasServerData =
+            typeof serverBoard.data === "string" &&
+            serverBoard.data.trim() !== "";
 
-          try {
-            scene = serverBoard.data
-              ? JSON.parse(serverBoard.data)
-              : { elements: [], appState: {} };
-          } catch {
-            scene = { elements: [], appState: {} };
+          // Пробуем загрузить локально
+          const local = await loadBoardLocal(numericId);
+
+          if (local) {
+            setElements(local.elements || []);
+            setFiles(local.files || {});
+            setAppState(local.appState);
+          } else {
+            // Если нет локальных — используем serverBoard
+            let scene;
+
+            try {
+              scene = serverBoard.data
+                ? JSON.parse(serverBoard.data)
+                : { elements: [], appState: {} };
+            } catch {
+              scene = { elements: [], appState: {} };
+            }
+
+            const fileIds = await getFileIds(numericId);
+            const files = await fetchBoardFiles(numericId, fileIds as FileId[]);
+
+            const safeAppState = scene.appState || {};
+            if (!Array.isArray(safeAppState.collaborators)) {
+              safeAppState.collaborators = [];
+            }
+
+            setElements(scene.elements || []);
+            setAppState(safeAppState);
+            setFiles(files);
+
+            await saveBoardLocal(numericId, {
+              elements: scene.elements || [],
+              appState: safeAppState,
+              files,
+            });
+            
+            if (hasServerData) toast.success('Board loaded from server');
           }
-
-          const fileIds = await getFileIds(numericId);
-          const files = await fetchBoardFiles(numericId, fileIds as FileId[]);
-
-          const safeAppState = scene.appState || {};
-          if (!Array.isArray(safeAppState.collaborators)) {
-            safeAppState.collaborators = [];
-          }
-
-          setElements(scene.elements || []);
-          setAppState(safeAppState);
-          setFiles(files);
-
-          await saveBoardLocal(numericId, {
-            elements: scene.elements || [],
-            appState: safeAppState,
-            files,
-          });
-          
-          if (hasServerData) toast.success('Board loaded from server');
         }
-
       } catch (err) {
         toast.error('Access denied or load failed');
         navigate('/app');
