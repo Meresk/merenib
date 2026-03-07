@@ -102,10 +102,31 @@ export const PowerOffIcon: React.FC<IconProps> = ({
   </svg>
 );
 
+export const ExportIcon: React.FC<IconProps> = ({ 
+  size = 20, 
+  strokeWidth = 1.8, 
+  ...props 
+}) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth={strokeWidth}
+    {...props}
+  >
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="7 10 12 15 17 10" />
+    <line x1="12" y1="15" x2="12" y2="3" />
+  </svg>
+);
+
 export const Icons = {
   Edit: EditIcon,
   DeleteLocal: DeleteLocalIcon,
   Delete: DeleteIcon,
   PowerOn: PowerOnIcon,
   PowerOff: PowerOffIcon,
+  Export: ExportIcon,
 };

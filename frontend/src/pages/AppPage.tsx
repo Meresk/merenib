@@ -98,6 +98,23 @@ export function AppPage() {
     }
   };
 
+  async function handleImportBoard(file: File) {
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+
+      if (data.type !== "excalidraw") throw new Error("Invalid file");
+
+      const name = file.name.replace(/\.excalidraw$/, "");
+
+      const board = await createBoard(name);
+
+      navigate(`/boards/${board.id}`, { state: { importedScene: data } });
+    } catch (err) {
+      console.error(err);
+      alert("Failed to import board: invalid file.");
+    }
+  }
 
   return (
     <div
@@ -140,7 +157,7 @@ export function AppPage() {
         ))}
 
         {/* Add board */}
-        <AddBoardCard onCreate={handleCreateBoard} />
+        <AddBoardCard onCreate={handleCreateBoard} onImport={handleImportBoard} />
       </div>
 
       

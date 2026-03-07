@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import styles from "../styles/AddBoardCard.module.css";
 
 type Props = {
   onCreate: (name: string) => Promise<void> | void;
+  onImport?: (file: File) => Promise<void>;
 };
 
-export function AddBoardCard({ onCreate }: Props) {
+export function AddBoardCard({ onCreate, onImport }: Props) {
   const [creating, setCreating] = useState(false);
   const [name, setName] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleCreate() {
     if (!name.trim()) return;
@@ -26,13 +28,26 @@ export function AddBoardCard({ onCreate }: Props) {
     setName("");
   }
 
+  function handleFileSelect() {
+    fileInputRef.current?.click();
+  }
+
+
   return (
     <div
-      className={`${styles.addCard} ${
-        creating ? styles.addCardActive : ""
-      }`}
+      className={`${styles.addCard} ${creating ? styles.addCardActive : ""}`}
       onClick={handleOpen}
-    >
+      onContextMenu={(e) => {
+        e.preventDefault();
+        handleFileSelect();
+      }}
+      onTouchStart={() => {
+        const timeout = setTimeout(handleFileSelect, 800);
+        const clear = () => clearTimeout(timeout);
+        document.addEventListener("touchend", clear, { once: true });
+        document.addEventListener("touchmove", clear, { once: true });
+      }}
+    > 
       {/* collapsed */}
       <div
         className={`${styles.addContent} ${
@@ -67,6 +82,20 @@ export function AddBoardCard({ onCreate }: Props) {
           </div>
         </div>
       </div>
+
+      {onImport && (
+        <input
+          type="file"
+          accept=".excalidraw"
+          style={{ display: "none" }}
+          ref={fileInputRef}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) onImport(file);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+          }}
+        />
+      )}
     </div>
   );
 }
