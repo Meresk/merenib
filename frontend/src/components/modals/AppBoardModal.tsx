@@ -82,7 +82,7 @@ export function BoardModal({ boardId, boardName, onClose, onUpdate, onDelete, on
 
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${boardName.replace(/[^\w\d]+/g, "_")}.excalidraw`;
+      a.download = `${boardName}.excalidraw`;
       a.click();
 
       URL.revokeObjectURL(url);
