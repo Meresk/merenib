@@ -61,7 +61,7 @@ docker compose up --build
 
 ## app tab
 <img width="2560" height="1393" alt="image" src="https://github.com/user-attachments/assets/83946c41-dacf-4f1d-8cf5-710ebc5e08e1" />
-<img width="2560" height="1393" alt="image" src="https://github.com/user-attachments/assets/edf9047a-e368-4559-bfbc-8677cf808b25" />
+<img width="2553" height="1396" alt="image" src="https://github.com/user-attachments/assets/4596f4ff-2b13-407c-9824-1cc76f128c74" />
 
 ## board tab
 <img width="2560" height="1393" alt="image" src="https://github.com/user-attachments/assets/365a860f-814f-4419-9e5e-67f5d50ea02c" />
