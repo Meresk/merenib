@@ -66,7 +66,6 @@ export function AddBoardCard({ onCreate, onImport }: Props) {
       >
         <div className={styles.createForm}>
           <input
-            autoFocus
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="name"

@@ -45,14 +45,16 @@ export function AppPage() {
   // --- effects 
   // page fade-in + load boards
   useEffect(() => {
-    const timeout = setTimeout(() => setVisible(true), 10);
-
     listBoards()
       .then((res) => setBoards(res || []))
       .finally(() => setLoading(false));
-
-    return () => clearTimeout(timeout);
   }, []);
+  useEffect(() => {
+    if (!loading) {
+      const timeout = setTimeout(() => setVisible(true), 10);
+      return () => clearTimeout(timeout);
+    }
+  }, [loading]);
 
   // load local boards info
   useEffect(() => {
@@ -122,43 +124,48 @@ export function AppPage() {
         visible ? styles.pageContainerVisible : ''
       }`}
     >
-      {loading && <Loader />}
+      {loading ? (
+        <Loader />
+      ) : (
+        <>
+          {/* Header */}
+          <div className={styles.header}>
+            <div 
+              className={styles.userPanel} 
+              onContextMenu={(e) => {
+                e.preventDefault();
+                handleChangeBackgroundModal();
+              }}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+              onTouchMove={handleTouchEnd}
+            >
+              <span className={styles.loggedText}>{user?.login}</span>
+              <button className={styles.logoutButton} onClick={handleLogout}>
+                Logout
+              </button>
+            </div>
+          </div>
 
-      {/* Header */}
-      <div className={styles.header}>
-        <div 
-          className={styles.userPanel} 
-          onContextMenu={(e) => {
-          
-          e.preventDefault();
-          handleChangeBackgroundModal();
-        }}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        onTouchMove={handleTouchEnd}>
-          <span className={styles.loggedText}>{user?.login}</span>
-          <button className={styles.logoutButton} onClick={handleLogout}>
-            Logout
-          </button>
-        </div>
-      </div>
+          {/* Boards grid*/}
+          <div className={styles.boardsGrid}>
+            {boards.map((b) => (
+              <BoardCard
+                key={b.id}
+                board={b}
+                isLocal={localBoards.has(b.id)}
+                onOpen={(id) => navigate(`/boards/${id}`)}
+                onOpenModal={setModalBoard}
+              />
+            ))}
 
-      {/* Boards grid*/}
-      <div className={styles.boardsGrid}>
-        {/* Boards */}
-        {boards.map((b) => (
-          <BoardCard
-            key={b.id}
-            board={b}
-            isLocal={localBoards.has(b.id)}
-            onOpen={(id) => navigate(`/boards/${id}`)}
-            onOpenModal={setModalBoard}
-          />
-        ))}
-
-        {/* Add board */}
-        <AddBoardCard onCreate={handleCreateBoard} onImport={handleImportBoard} />
-      </div>
+            <AddBoardCard
+              onCreate={handleCreateBoard}
+              onImport={handleImportBoard}
+            />
+          </div>
+        </>
+)}
 
       
       {/* Modal for boards */}
