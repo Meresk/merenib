@@ -30,6 +30,11 @@
   padding: 6px 14px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: background 0.25s ease
+}
+
+.userPanel:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .loggedText {
@@ -46,10 +51,11 @@
   color: #fff;
   font-size: 13px;
   outline: none;
+  transition: background 0.25s ease
 }
 
-.logoutButton:active {
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12);
+.logoutButton:hover {
+  background: rgba(177, 9, 9, 0.145);
 }
 
 /* ---------- GRID ---------- */

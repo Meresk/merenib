@@ -91,10 +91,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: background 0.15s ease;
+  border: 0;
 }
 
-.circleButton:active {
-  transform: scale(0.9);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12);
+.circleButton:hover {
+  background: rgba(255, 255, 255, 0.13);
 }

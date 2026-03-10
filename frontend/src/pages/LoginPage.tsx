@@ -26,6 +26,7 @@ export const LoginPage = () => {
   const [loginFormOpen, setLoginFormOpen] = useState(false);
   const [colorMenuOpen, setColorMenuOpen] = useState(false);
   const [changeBackgroundModalOpen, setChangeBackgroundModalOpen] = useState(false);
+  const [pageLeaving, setPageLeaving] = useState(false);
 
   // --- derived
   const { user, login } = useAuth();
@@ -40,10 +41,10 @@ export const LoginPage = () => {
   // if already authorized - redirect to main page
   useEffect(() => {
     if (user) {
-      if (user.is_admin) navigate('/dashboard', { replace: true });
-      else navigate('/app', { replace: true });
+      if (user.is_admin) handleNavigate('/dashboard');
+      else handleNavigate('/app');
     }
-  }, [user, navigate]);
+  }, [user]);
 
   // --- handlers
   const handleLoginSubmit = async (e: React.FormEvent) => {
@@ -108,10 +109,18 @@ export const LoginPage = () => {
     }
   };
 
+  const handleNavigate = (to: string) => {
+    setPageLeaving(true);
+
+    setTimeout(() => {
+      navigate(to, { replace: true });
+    }, 250);
+  };
+
 
 
   return (
-    <>
+    <div className={`${styles.page} ${pageLeaving ? styles.leaving : ''}`}>
       <div
         className={`${styles.loginMorph} ${loginFormOpen ? styles.open : ''} ${
           authError ? styles.formError : ''
@@ -184,6 +193,6 @@ export const LoginPage = () => {
       {changeBackgroundModalOpen && (
         <BymereskModal onClose={() => setChangeBackgroundModalOpen(false)} />
       )}
-    </>
+    </div>
   );
 };

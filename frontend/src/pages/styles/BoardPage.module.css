@@ -2,12 +2,29 @@
   height: 100vh;
   width: 100vw;
   position: relative;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.leaving {
+  opacity: 0;
+  transform: scale(0.98);
 }
 
 .excalidrawWrapper {
   position: relative;
   width: 100%;
   height: 100%;
+
+  animation: excalidrawFadeIn 0.5s ease;
+}
+
+@keyframes excalidrawFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .overlayLoader {
